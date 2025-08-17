@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Orchid\Screen\AsSource;           // 👈 مهم لـ Orchid
-use Orchid\Filters\Filterable;        // 👈 للفرز/الفلترة في الجداول (اختياري لكنه مفيد)
+use Orchid\Screen\AsSource;
+use Orchid\Filters\Filterable;
 
 class Category extends Model
 {
@@ -14,17 +14,25 @@ class Category extends Model
         'parent_id', 'name', 'slug', 'description', 'is_active', 'sort_order',
     ];
 
-    // أسماء الأعمدة المسموح فرزها/فلترتها من جدول Orchid
+    // لأوركيد (اختياري)
     protected $allowedSorts   = ['name', 'is_active', 'sort_order', 'created_at'];
     protected $allowedFilters = ['name', 'is_active'];
 
-    public function parent()
+    // علاقات
+    public function parent()   { return $this->belongsTo(self::class, 'parent_id'); }
+    public function children() { return $this->hasMany(self::class, 'parent_id'); }
+
+    /* ==== السكوبات المطلوبة للهوم ==== */
+
+    // يعيد التصنيفات المفعّلة فقط
+    public function scopeActive($q)
     {
-        return $this->belongsTo(self::class, 'parent_id');
+        return $q->where('is_active', true);
     }
 
-    public function children()
+    // يعيد التصنيفات الرئيسية فقط (بدون أب)
+    public function scopeTopLevel($q)
     {
-        return $this->hasMany(self::class, 'parent_id');
+        return $q->whereNull('parent_id');
     }
 }

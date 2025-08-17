@@ -3,22 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Orchid\Screen\AsSource;
 
 class Setting extends Model
 {
-    protected $fillable = ['key','value','group'];
+    use AsSource;
 
-    public static function get(string $key, $default=null){
-        $row = static::query()->where('key',$key)->first();
-        if(!$row) return $default;
-        $decoded = json_decode($row->value, true);
-        return json_last_error() === JSON_ERROR_NONE ? $decoded : $row->value;
-    }
+    public $timestamps = true;
+    protected $fillable = ['group','key','value'];
 
-    public static function put(string $key, $value, ?string $group=null): void {
-        static::updateOrCreate(['key'=>$key], [
-            'value' => is_array($value) ? json_encode($value) : $value,
-            'group' => $group,
-        ]);
+    // helper get('key', default) إن لم تكن موجودة
+    public static function get($key, $default = null)
+    {
+        $row = static::where('key', $key)->first();
+        return $row ? $row->value : $default;
     }
 }

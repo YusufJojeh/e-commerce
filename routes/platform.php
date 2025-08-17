@@ -19,6 +19,15 @@ use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
 use App\Orchid\Screens\CategoryListScreen;
 use App\Orchid\Screens\CategoryEditScreen;
+use App\Orchid\Screens\BrandListScreen;
+use App\Orchid\Screens\BrandEditScreen;
+use App\Orchid\Screens\ProductListScreen;
+use App\Orchid\Screens\ProductEditScreen;
+use App\Orchid\Screens\OfferListScreen;
+use App\Orchid\Screens\OfferEditScreen;
+use App\Orchid\Screens\SlideListScreen;
+use App\Orchid\Screens\SlideEditScreen;
+use App\Orchid\Screens\SettingScreen;
 use Illuminate\Support\Facades\Route;
 
 use Tabuna\Breadcrumbs\Trail;
@@ -128,3 +137,80 @@ Route::screen('categories/{category}/edit', CategoryEditScreen::class)
     ->breadcrumbs(fn (Trail $trail, $category) => $trail
         ->parent('platform.categories.list')
         ->push('Edit', route('platform.categories.edit', $category)));
+        Route::screen('brands', BrandListScreen::class)
+        ->name('platform.brands.list')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.index')
+            ->push('Brands', route('platform.brands.list')));
+
+    // Brands create
+    Route::screen('brands/create', BrandEditScreen::class)
+        ->name('platform.brands.create')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.brands.list')
+            ->push('Create', route('platform.brands.create')));
+
+    // Brands edit
+    Route::screen('brands/{brand}/edit', BrandEditScreen::class)
+        ->name('platform.brands.edit')
+        ->breadcrumbs(fn (Trail $trail, $brand) => $trail
+            ->parent('platform.brands.list')
+            ->push('Edit', route('platform.brands.edit', $brand)));
+            Route::screen('products', ProductListScreen::class)
+    ->name('platform.products.list')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push('Products', route('platform.products.list')));
+
+// Products create
+Route::screen('products/create', ProductEditScreen::class)
+    ->name('platform.products.create')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.products.list')
+        ->push('Create', route('platform.products.create')));
+
+// Products edit
+Route::screen('products/{product}/edit', ProductEditScreen::class)
+    ->name('platform.products.edit')
+    ->breadcrumbs(fn (Trail $trail, $product) => $trail
+        ->parent('platform.products.list')
+        ->push('Edit', route('platform.products.edit', $product)));
+
+// Offers list
+Route::screen('offers', OfferListScreen::class)
+->name('platform.offers.list')
+->breadcrumbs(fn (Trail $trail) => $trail
+    ->parent('platform.index')
+    ->push('Offers', route('platform.offers.list')));
+
+// Offers create
+Route::screen('offers/create', OfferEditScreen::class)
+->name('platform.offers.create')
+->breadcrumbs(fn (Trail $trail) => $trail
+    ->parent('platform.offers.list')
+    ->push('Create', route('platform.offers.create')));
+
+// Offers edit
+Route::screen('offers/{offer}/edit', OfferEditScreen::class)
+->name('platform.offers.edit')
+->breadcrumbs(fn (Trail $trail, $offer) => $trail
+    ->parent('platform.offers.list')
+    ->push('Edit', route('platform.offers.edit', $offer)));
+    // Slides list
+Route::screen('slides', SlideListScreen::class)
+->name('platform.slides.list')
+->breadcrumbs(fn (Trail $trail) => $trail->parent('platform.index')->push('Slides', route('platform.slides.list')));
+
+// Slides create
+Route::screen('slides/create', SlideEditScreen::class)
+->name('platform.slides.create')
+->breadcrumbs(fn (Trail $trail) => $trail->parent('platform.slides.list')->push('Create', route('platform.slides.create')));
+
+// Slides edit
+Route::screen('slides/{slide}/edit', SlideEditScreen::class)
+->name('platform.slides.edit')
+->breadcrumbs(fn (Trail $trail, $slide) => $trail->parent('platform.slides.list')->push('Edit', route('platform.slides.edit', $slide)));
+//Settings
+Route::screen('settings', SettingScreen::class)
+    ->name('platform.settings')
+    ->breadcrumbs(fn (Trail $trail) => $trail->parent('platform.index')->push('Settings', route('platform.settings')));

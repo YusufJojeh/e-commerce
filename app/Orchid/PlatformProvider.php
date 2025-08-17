@@ -41,6 +41,11 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make('Categories')
             ->icon('bs.collection')
             ->route('platform.categories.list'),
+            Menu::make('Brands')->icon('bs.tags')->route('platform.brands.list'),
+            Menu::make('Products')->icon('bs.box')->route('platform.products.list'),
+            Menu::make('Offers')->icon('bs.ticket-perforated')->route('platform.offers.list'),
+            Menu::make('Slides')->icon('bs.images')->route('platform.slides.list'),
+            Menu::make('Settings')->icon('bs.gear')->route('platform.settings'),
 
             Menu::make('Sample Screen')
                 ->icon('bs.collection')
