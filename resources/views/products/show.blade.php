@@ -21,14 +21,8 @@
   <div class="row g-4">
     {{-- Images --}}
     <div class="col-12 col-md-6">
-      @php
-        $primary = optional($product->primaryImage)->path
-          ? asset('storage/' . $product->primaryImage->path)
-          : asset('storage/products/sample.jpg');
-      @endphp
-
       <div class="card mb-3">
-        <img src="{{ $primary }}" class="card-img-top" alt="{{ $product->name }}" loading="eager">
+        <img src="{{ $product->primary_image_url }}" class="card-img-top" alt="{{ $product->name }}" loading="eager">
       </div>
 
       @if($product->images->count() > 1)
@@ -36,7 +30,7 @@
           @foreach($product->images as $img)
             <div class="col-3">
               <img
-                src="{{ asset('storage/' . $img->path) }}"
+                src="{{ $img->url }}"
                 class="img-fluid rounded border"
                 alt="{{ $img->alt ?? $product->name }}"
                 loading="lazy"

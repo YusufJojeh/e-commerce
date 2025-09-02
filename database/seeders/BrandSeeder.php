@@ -6,6 +6,7 @@ use App\Models\Brand;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BrandSeeder extends Seeder
 {
@@ -35,7 +36,7 @@ class BrandSeeder extends Seeder
                         'name'       => $r['name'],
                         'is_external'=> $r['is_external'],
                         'is_active'  => true,
-                        'logo_path'  => $r['logo'],
+                        'logo_path'  => $this->createDemoImage('brands', $r['name']),
                         'sort_order' => $order++,
                         'created_at' => $now,
                         'updated_at' => $now,
@@ -43,5 +44,22 @@ class BrandSeeder extends Seeder
                 );
             }
         });
+    }
+
+        /**
+     * Create a demo image file in the public disk
+     */
+    private function createDemoImage(string $folder, string $name): string
+    {
+        $filename = Str::random(16) . '.jpg';
+        $path = $folder . '/' . $filename;
+        
+        // Create a simple demo image content (this is just a placeholder)
+        $imageContent = "Demo image for: " . $name;
+        
+        // Store the file in the public disk
+        Storage::disk('public')->put($path, $imageContent, 'public');
+        
+        return $path;
     }
 }

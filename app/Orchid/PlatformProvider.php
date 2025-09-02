@@ -14,16 +14,22 @@ class PlatformProvider extends OrchidServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
-     * @param Dashboard $dashboard
-     *
-     * @return void
      */
     public function boot(Dashboard $dashboard): void
     {
         parent::boot($dashboard);
 
-        // ...
+        // ثيم ديناميكي قادم من الإعدادات (يؤثر على اللوحة والواجهة إن استخدمته هناك أيضاً)
+        $dashboard->registerResource('stylesheets', '/theme.css');
+
+        // أي تخصيصات إضافية للوحة (اختياري)
+        $dashboard->registerResource('stylesheets', '/css/platform-theme.css');
+
+        // Crystal theme enhancements for Orchid platform
+        $dashboard->registerResource('stylesheets', '/css/crystal-platform.css');
+
+        // Custom JavaScript for platform animations
+        $dashboard->registerResource('scripts', '/js/crystal-platform.js');
     }
 
     /**
@@ -34,46 +40,53 @@ class PlatformProvider extends OrchidServiceProvider
     public function menu(): array
     {
         return [
+            // ====== الرئيسي
             Menu::make('Dashboard')
-            ->icon('bs.house')        // أيقونة Bootstrap Icons مدمجة
-            ->route('platform.index'),
+                ->icon('bs.house')
+                ->route('platform.index'),
+
+            // ====== الكاتالوج
+            Menu::make('Catalog')->title('Catalog'),
 
             Menu::make('Categories')
-            ->icon('bs.collection')
-            ->route('platform.categories.list'),
-            Menu::make('Brands')->icon('bs.tags')->route('platform.brands.list'),
-            Menu::make('Products')->icon('bs.box')->route('platform.products.list'),
-            Menu::make('Offers')->icon('bs.ticket-perforated')->route('platform.offers.list'),
-            Menu::make('Slides')->icon('bs.images')->route('platform.slides.list'),
-            Menu::make('Settings')->icon('bs.gear')->route('platform.settings'),
-
-            Menu::make('Sample Screen')
                 ->icon('bs.collection')
-                ->route('platform.example')
-                ->badge(fn () => 6),
+                ->route('platform.categories.list'),
 
-            Menu::make('Form Elements')
-                ->icon('bs.card-list')
-                ->route('platform.example.fields')
-                ->active('*/examples/form/*'),
+            Menu::make('Brands')
+                ->icon('bs.tags')
+                ->route('platform.brands.list'),
 
-            Menu::make('Layouts Overview')
-                ->icon('bs.window-sidebar')
-                ->route('platform.example.layouts'),
+            Menu::make('Products')
+                ->icon('bs.box')
+                ->route('platform.products.list'),
 
-            Menu::make('Grid System')
-                ->icon('bs.columns-gap')
-                ->route('platform.example.grid'),
+            Menu::make('Offers')
+                ->icon('bs.ticket-perforated')
+                ->route('platform.offers.list'),
 
-            Menu::make('Charts')
-                ->icon('bs.bar-chart')
-                ->route('platform.example.charts'),
+            Menu::make('Slides')
+                ->icon('bs.images')
+                ->route('platform.slides.list'),
 
-            Menu::make('Cards')
-                ->icon('bs.card-text')
-                ->route('platform.example.cards')
-                ->divider(),
+            // ====== إعدادات الموقع
+            Menu::make('Site')->title('Site'),
 
+            Menu::make('Appearance')                // شاشة التحكم بالثيم/الألوان والشعارات
+                ->icon('bs.palette')
+                ->route('platform.appearance')
+                ->permission('manage.appearance'),
+
+            Menu::make('Settings')                  // إعدادات عامة
+                ->icon('bs.gear')
+                ->route('platform.settings')
+                ->permission('manage.settings'),
+
+            Menu::make('Home Settings')             // إعدادات الصفحة الرئيسية (إن كنت تستخدمها)
+                ->icon('bs.sliders')
+                ->route('platform.site.home')
+                ->permission('manage.settings'),
+
+            // ====== الصلاحيات
             Menu::make(__('Users'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')
@@ -83,20 +96,7 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make(__('Roles'))
                 ->icon('bs.shield')
                 ->route('platform.systems.roles')
-                ->permission('platform.systems.roles')
-                ->divider(),
-
-            Menu::make('Documentation')
-                ->title('Docs')
-                ->icon('bs.box-arrow-up-right')
-                ->url('https://orchid.software/en/docs')
-                ->target('_blank'),
-
-            Menu::make('Changelog')
-                ->icon('bs.box-arrow-up-right')
-                ->url('https://github.com/orchidsoftware/platform/blob/master/CHANGELOG.md')
-                ->target('_blank')
-                ->badge(fn () => Dashboard::version(), Color::DARK),
+                ->permission('platform.systems.roles'),
         ];
     }
 
@@ -111,6 +111,10 @@ class PlatformProvider extends OrchidServiceProvider
             ItemPermission::group(__('System'))
                 ->addPermission('platform.systems.roles', __('Roles'))
                 ->addPermission('platform.systems.users', __('Users')),
+
+            ItemPermission::group('Settings')
+                ->addPermission('manage.settings', 'Manage Site Settings')
+                ->addPermission('manage.appearance', 'Manage Appearance & Branding'),
         ];
     }
 }

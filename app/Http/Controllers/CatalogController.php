@@ -18,7 +18,7 @@ class CatalogController extends Controller
         $sort     = $request->input('sort', 'latest'); // latest | price_low | price_high | name
 
         $products = Product::active()
-            ->with(['primaryImage','brand','category'])
+            ->with(['images','brand','category'])
             ->when($q !== '', function ($qq) use ($q) {
                 $qq->where(function($w) use ($q) {
                     $w->where('name', 'like', "%{$q}%")
@@ -62,32 +62,47 @@ class CatalogController extends Controller
         return view('products.show', compact('product'));
     }
 
-    // /category/{slug} — سنفصلها بالخطوة القادمة
+    // /categories — All categories page
+    public function categories()
+    {
+        $categories = Category::active()
+            ->withCount(['products', 'children'])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return view('categories.index', compact('categories'));
+    }
+
+    // /category/{slug} — Category page with products
     public function category(string $slug, Request $request)
     {
-        $category = Category::active()->where('slug',$slug)->firstOrFail();
+        $category = Category::active()
+            ->with(['children', 'parent'])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        // تضمين أبناء التصنيف (مستوى واحد) إن وجِد
+        // Include child category IDs (one level) if they exist
         $childIds = $category->children()->pluck('id');
         $catIds   = collect([$category->id])->merge($childIds);
 
-        $products = Product::active()
-            ->with(['primaryImage','brand','category'])
-            ->whereIn('category_id', $catIds)
-            ->latest('published_at')
-            ->paginate(12)
-            ->withQueryString();
+        $sort = $request->input('sort', 'latest');
 
-        return view('products.index', [
-            'products'   => $products,
-            'brands'     => Brand::where('is_active',1)->orderBy('name')->get(['name','slug']),
-            'categories' => Category::active()->orderBy('sort_order')->get(['name','slug']),
-            'q'          => '',
-            'brand'      => null,
-            'category'   => $slug,
-            'sort'       => 'latest',
-            'pageTitle'  => 'Category: '.$category->name,
-        ]);
+        $products = Product::active()
+            ->with(['images', 'brand', 'category'])
+            ->whereIn('category_id', $catIds);
+
+        // Apply sorting
+        switch ($sort) {
+            case 'price_low':  $products->orderBy('sale_price')->orderBy('price'); break;
+            case 'price_high': $products->orderByDesc('sale_price')->orderByDesc('price'); break;
+            case 'name':       $products->orderBy('name'); break;
+            default:           $products->latest('published_at'); // latest
+        }
+
+        $products = $products->paginate(12)->withQueryString();
+
+        return view('categories.show', compact('category', 'products', 'sort'));
     }
 
     // /brand/{slug} — سنفصلها بالخطوة القادمة
@@ -96,7 +111,7 @@ class CatalogController extends Controller
         $brand = Brand::where('is_active',1)->where('slug',$slug)->firstOrFail();
 
         $products = Product::active()
-            ->with(['primaryImage','brand','category'])
+            ->with(['images','brand','category'])
             ->where('brand_id', $brand->id)
             ->latest('published_at')
             ->paginate(12)

@@ -18,4 +18,22 @@ class Setting extends Model
         $row = static::where('key', $key)->first();
         return $row ? $row->value : $default;
     }
+
+    // helper set('key', value) لحفظ أو تحديث القيمة
+    public static function set($key, $value)
+    {
+        $row = static::where('key', $key)->first();
+
+        if ($row) {
+            $row->update(['value' => $value]);
+        } else {
+            static::create([
+                'key' => $key,
+                'value' => $value,
+                'group' => 'general'
+            ]);
+        }
+
+        return $value;
+    }
 }

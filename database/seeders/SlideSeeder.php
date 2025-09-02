@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Slide;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SlideSeeder extends Seeder
 {
@@ -13,7 +15,7 @@ class SlideSeeder extends Seeder
             ['position' => 'main', 'title' => 'Big Summer Sale'],
             [
                 'subtitle'   => 'Up to 50% off',
-                'image_path' => 'banners/hero.jpg',
+                'image_path' => $this->createDemoImage('slides', 'Big Summer Sale'),
                 'cta_label'  => 'Shop Now',
                 'cta_url'    => '/products',
                 'sort_order' => 0,
@@ -29,7 +31,7 @@ class SlideSeeder extends Seeder
                 ['position' => 'slider', 'title' => $title],
                 [
                     'subtitle'   => null,
-                    'image_path' => "banners/slider-".($i+1).".jpg",
+                    'image_path' => $this->createDemoImage('slides', $title),
                     'cta_label'  => 'Browse',
                     'cta_url'    => '/products',
                     'sort_order' => $i,
@@ -39,5 +41,22 @@ class SlideSeeder extends Seeder
                 ]
             );
         }
+    }
+
+    /**
+     * Create a demo image file in the public disk
+     */
+    private function createDemoImage(string $folder, string $name): string
+    {
+        $filename = Str::random(16) . '.jpg';
+        $path = $folder . '/' . $filename;
+        
+        // Create a simple demo image content (this is just a placeholder)
+        $imageContent = "Demo image for: " . $name;
+        
+        // Store the file in the public disk
+        Storage::disk('public')->put($path, $imageContent, 'public');
+        
+        return $path;
     }
 }

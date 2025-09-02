@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
@@ -28,6 +29,10 @@ class ProductSeeder extends Seeder
             return;
         }
 
+        // Clean up old ProductImage records with old paths
+        ProductImage::where('path', 'products/sample.jpg')->delete();
+        ProductImage::where('path', 'like', 'products/%')->delete();
+
         DB::transaction(function () use ($catIds, $brandIds) {
             $now = now();
             $adjectives = ['Ultra','Pro','Smart','Eco','Max','Prime','Lite','Plus','Air','Go'];
@@ -42,28 +47,32 @@ class ProductSeeder extends Seeder
                 $hasSale = random_int(1, 100) <= 35;
                 $sale = $hasSale ? round($price * (random_int(60, 90) / 100), 2) : null;
 
-                $p = Product::create([
-                    'category_id'       => $catIds[array_rand($catIds)],
-                    'brand_id'          => $brandIds[array_rand($brandIds)],
-                    'name'              => $name,
-                    'slug'              => $slug,
-                    'short_description' => 'Short description for ' . $name,
-                    'description'       => 'Detailed description for ' . $name . '.',
-                    'sku'               => strtoupper(Str::random(8)),
-                    'price'             => $price,
-                    'sale_price'        => $sale,
-                    'stock_qty'         => random_int(0, 200),
-                    'is_active'         => random_int(1, 100) <= 90,
-                    'is_featured'       => random_int(1, 100) <= 25,
-                    'published_at'      => $now->copy()->subDays(random_int(0, 90))->setTime(random_int(0,23), random_int(0,59)),
-                    'created_at'        => $now,
-                    'updated_at'        => $now,
-                ]);
+                $p = Product::updateOrCreate(
+                    ['slug' => $slug],
+                    [
+                        'category_id'       => $catIds[array_rand($catIds)],
+                        'brand_id'          => $brandIds[array_rand($brandIds)],
+                        'name'              => $name,
+                        'short_description' => 'Short description for ' . $name,
+                        'description'       => 'Detailed description for ' . $name . '.',
+                        'sku'               => strtoupper(Str::random(8)),
+                        'price'             => $price,
+                        'sale_price'        => $sale,
+                        'stock_qty'         => random_int(0, 200),
+                        'is_active'         => random_int(1, 100) <= 90,
+                        'is_featured'       => random_int(1, 100) <= 25,
+                        'published_at'      => $now->copy()->subDays(random_int(0, 90))->setTime(random_int(0,23), random_int(0,59)),
+                        'updated_at'        => $now,
+                    ]
+                );
+
+                // Create demo image for product
+                $imagePath = $this->createDemoImage('products', $p->name);
 
                 // صورة أساسية
                 ProductImage::create([
                     'product_id' => $p->id,
-                    'path'       => 'products/sample.jpg',
+                    'path'       => $imagePath,
                     'alt'        => $p->name,
                     'is_primary' => true,
                     'sort_order' => 0,
@@ -74,7 +83,7 @@ class ProductSeeder extends Seeder
                 // صورتان إضافيتان
                 ProductImage::create([
                     'product_id' => $p->id,
-                    'path'       => 'products/sample.jpg',
+                    'path'       => $imagePath,
                     'alt'        => $p->name.' view 2',
                     'is_primary' => false,
                     'sort_order' => 1,
@@ -84,7 +93,7 @@ class ProductSeeder extends Seeder
 
                 ProductImage::create([
                     'product_id' => $p->id,
-                    'path'       => 'products/sample.jpg',
+                    'path'       => $imagePath,
                     'alt'        => $p->name.' view 3',
                     'is_primary' => false,
                     'sort_order' => 2,
@@ -93,5 +102,22 @@ class ProductSeeder extends Seeder
                 ]);
             }
         });
+    }
+
+            /**
+     * Create a demo image file in the public disk
+     */
+    private function createDemoImage(string $folder, string $name): string
+    {
+        $filename = Str::random(16) . '.jpg';
+        $path = $folder . '/' . $filename;
+
+        // Create a simple demo image content (this is just a placeholder)
+        $imageContent = "Demo image for: " . $name;
+
+        // Store the file in the public disk
+        Storage::disk('public')->put($path, $imageContent, 'public');
+
+        return $path;
     }
 }

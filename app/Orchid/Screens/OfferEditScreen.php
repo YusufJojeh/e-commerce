@@ -4,36 +4,39 @@ namespace App\Orchid\Screens;
 
 use App\Models\Offer;
 use App\Models\Product;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
+
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
+use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\Switcher;
 use Orchid\Screen\Fields\DateTimer;
-use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
 
 class OfferEditScreen extends Screen
 {
-    public $offer;
+    public ?Offer $offer = null;
 
     public function query(Offer $offer): array
     {
-        $this->offer = $offer->load('products');
+        $this->offer = $offer;
 
-        // pre-select product ids
         return [
-            'offer'       => $this->offer,
-            'product_ids' => $this->offer->exists ? $this->offer->products->pluck('id')->all() : [],
+            'offer' => $offer,
+            'products' => Product::active()->get(),
+            'selected_products' => $offer->exists ? $offer->products->pluck('id')->toArray() : [],
         ];
     }
 
     public function name(): ?string
     {
-        return $this->offer && $this->offer->exists ? 'Edit Offer' : 'Create Offer';
+        return $this->offer?->exists ? 'Edit Offer' : 'Create Offer';
     }
 
     public function commandBar(): array
@@ -44,16 +47,32 @@ class OfferEditScreen extends Screen
                 ->icon('bs.trash')
                 ->confirm('Delete this offer?')
                 ->method('remove')
-                ->canSee($this->offer && $this->offer->exists),
+                ->canSee($this->offer?->exists),
         ];
     }
 
     public function layout(): array
     {
+        $bannerHelp = $this->offer->banner_url
+            ? 'Current: ' . $this->offer->banner_url
+            : 'Upload banner (JPG/PNG/WebP). Max 5MB';
+
         return [
+            // Current banner display (only for existing offers)
+            Layout::view('partials.current-image', [
+                'image_url' => $this->offer?->banner_url,
+                'image_path' => $this->offer?->banner_image,
+                'title' => 'Current Banner'
+            ])->canSee($this->offer?->exists && $this->offer?->banner_image),
+
             Layout::rows([
-                Input::make('offer.title')->title('Title')->required(),
-                TextArea::make('offer.description')->title('Description')->rows(3),
+                Input::make('offer.title')
+                    ->title('Title')
+                    ->required(),
+
+                TextArea::make('offer.description')
+                    ->title('Description')
+                    ->rows(3),
 
                 Select::make('offer.type')
                     ->title('Type')
@@ -74,53 +93,73 @@ class OfferEditScreen extends Screen
                 DateTimer::make('offer.starts_at')->title('Starts at')->allowInput(),
                 DateTimer::make('offer.ends_at')->title('Ends at')->allowInput(),
 
-                Switcher::make('offer.is_active')->title('Active')->sendTrueOrFalse()->value(true),
+                Switcher::make('offer.is_active')->title('Active')->sendTrueOrFalse()->value($this->offer?->exists ? (bool)$this->offer->is_active : true),
 
-                Input::make('offer.banner_image')->title('Banner image path')->placeholder('banners/summer.jpg'),
-                Input::make('offer.cta_url')->title('CTA URL')->placeholder('/products'),
+                // Upload banner (instead of path)
+                Input::make('banner')
+                    ->type('file')
+                    ->acceptedFiles('image/*')
+                    ->title('Banner Image')
+                    ->help($bannerHelp),
+
+                Input::make('offer.cta_url')
+                    ->title('CTA URL')
+                    ->placeholder('/products'),
 
                 // Attach products
                 Select::make('product_ids')
-                    ->title('Products in this offer')
+                    ->title('Products')
                     ->fromModel(Product::class, 'name', 'id')
                     ->multiple()
-                    ->help('Choose products to include in this offer'),
-            ])->title('Offer Details'),
+                    ->help('Select products for this offer'),
+            ])->title('Offer details'),
         ];
     }
 
     public function createOrUpdate(Request $request, Offer $offer)
     {
-        $data = $request->validate([
+        $imageService = app(ImageService::class);
+
+        $validationRules = [
             'offer.title'       => ['required','string','max:255'],
             'offer.description' => ['nullable','string'],
             'offer.type'        => ['required', Rule::in(['percent','fixed','free_shipping'])],
-            'offer.value'       => ['nullable','numeric'],
+            'offer.value'       => ['nullable','numeric','min:0'],
             'offer.starts_at'   => ['nullable','date'],
             'offer.ends_at'     => ['nullable','date','after_or_equal:offer.starts_at'],
-            'offer.is_active'   => ['boolean'],
-            'offer.banner_image'=> ['nullable','string','max:255'],
+            'offer.is_active'   => ['nullable','boolean'],
             'offer.cta_url'     => ['nullable','string','max:255'],
-            'product_ids'       => ['array'],
-            'product_ids.*'     => ['integer','exists:products,id'],
-        ]);
+            'product_ids'       => ['nullable','array'],
+            'product_ids.*'     => ['exists:products,id'],
+        ];
 
-        // Conditional rules: enforce value for percent/fixed
-        $type = $data['offer']['type'];
-        if (in_array($type, ['percent','fixed'], true)) {
-            $request->validate([
-                'offer.value' => ['required','numeric', $type === 'percent' ? 'min:1|max:100' : 'min:0'],
-            ]);
-        } else {
-            // free_shipping: ignore value
-            $data['offer']['value'] = null;
+        // Add banner validation rules
+        $bannerRules = $imageService->getValidationRules('banner', false);
+        $validationRules = array_merge($validationRules, $bannerRules);
+
+        $data = $request->validate($validationRules);
+
+        $offer->fill($data['offer']);
+
+        // Store banner in public/offers and delete old one when replacing
+        if ($request->hasFile('banner')) {
+            $file = $request->file('banner');
+            $uploadOptions = $imageService->getUploadOptions('offers');
+
+            $result = $imageService->upload($file, 'offers', $uploadOptions);
+
+            if ($result['success']) {
+                $offer->banner_image = $result['path'];
+            } else {
+                Toast::error('Banner upload failed: ' . $result['error']);
+                return back();
+            }
         }
 
-        $offer->fill($data['offer'])->save();
+        $offer->save();
 
         // sync products
-        $ids = $data['product_ids'] ?? [];
-        $offer->products()->sync($ids);
+        $offer->products()->sync($data['product_ids'] ?? []);
 
         Toast::info('Saved.');
         return redirect()->route('platform.offers.edit', $offer);
@@ -129,12 +168,14 @@ class OfferEditScreen extends Screen
     public function remove(Offer $offer)
     {
         try {
+            // Banner will be automatically deleted via model events
             $offer->products()->detach();
             $offer->delete();
+
             Toast::info('Deleted.');
             return redirect()->route('platform.offers.list');
         } catch (\Throwable $e) {
-            Toast::error('Cannot delete: '.$e->getMessage());
+            Toast::error('Cannot delete: ' . $e->getMessage());
             return back();
         }
     }

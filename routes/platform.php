@@ -28,6 +28,8 @@ use App\Orchid\Screens\OfferEditScreen;
 use App\Orchid\Screens\SlideListScreen;
 use App\Orchid\Screens\SlideEditScreen;
 use App\Orchid\Screens\SettingScreen;
+use App\Orchid\Screens\HomeSettingsScreen;
+use App\Orchid\Screens\AppearanceScreen;
 use Illuminate\Support\Facades\Route;
 
 use Tabuna\Breadcrumbs\Trail;
@@ -214,3 +216,15 @@ Route::screen('slides/{slide}/edit', SlideEditScreen::class)
 Route::screen('settings', SettingScreen::class)
     ->name('platform.settings')
     ->breadcrumbs(fn (Trail $trail) => $trail->parent('platform.index')->push('Settings', route('platform.settings')));
+
+    Route::screen('site/home-settings', HomeSettingsScreen::class)
+    ->name('platform.site.home')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push('Home Settings', route('platform.site.home')));
+
+        Route::screen('appearance', AppearanceScreen::class)
+        ->name('platform.appearance')
+        ->breadcrumbs(fn ($trail) => $trail
+            ->parent('platform.index')
+            ->push('Appearance', route('platform.appearance')));

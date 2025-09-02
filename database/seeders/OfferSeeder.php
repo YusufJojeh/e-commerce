@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Offer;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class OfferSeeder extends Seeder
 {
@@ -25,7 +27,7 @@ class OfferSeeder extends Seeder
                 'starts_at'   => $now->copy()->subDays(5),
                 'ends_at'     => $now->copy()->addDays(10),
                 'is_active'   => true,
-                'banner_image'=> 'banners/summer.jpg',
+                'banner_image'=> $this->createDemoImage('offers', 'Summer Sale 10%'),
                 'cta_url'     => '/products',
             ]
         );
@@ -39,7 +41,7 @@ class OfferSeeder extends Seeder
                 'starts_at'   => $now->copy()->subDays(2),
                 'ends_at'     => $now->copy()->addDays(5),
                 'is_active'   => true,
-                'banner_image'=> 'banners/flat.jpg',
+                'banner_image'=> $this->createDemoImage('offers', 'Flat 20 Off'),
                 'cta_url'     => '/products',
             ]
         );
@@ -53,7 +55,7 @@ class OfferSeeder extends Seeder
                 'starts_at'   => $now->copy()->subDays(12),
                 'ends_at'     => $now->copy()->subDays(7),
                 'is_active'   => true,
-                'banner_image'=> 'banners/free-ship.jpg',
+                'banner_image'=> $this->createDemoImage('offers', 'Free Shipping Weekend'),
                 'cta_url'     => '/products',
             ]
         );
@@ -65,5 +67,22 @@ class OfferSeeder extends Seeder
             $summer->products()->sync($ids->slice(0, 10)->all());
             $fixed->products()->sync($ids->slice(10, 10)->all());
         }
+    }
+
+        /**
+     * Create a demo image file in the public disk
+     */
+    private function createDemoImage(string $folder, string $name): string
+    {
+        $filename = Str::random(16) . '.jpg';
+        $path = $folder . '/' . $filename;
+        
+        // Create a simple demo image content (this is just a placeholder)
+        $imageContent = "Demo image for: " . $name;
+        
+        // Store the file in the public disk
+        Storage::disk('public')->put($path, $imageContent, 'public');
+        
+        return $path;
     }
 }

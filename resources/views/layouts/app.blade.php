@@ -8,7 +8,7 @@
   {{-- Bootstrap --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  {{-- ===== No-FOUC: ثبّت الثيم مبكراً (light/dark) ===== --}}
+  {{-- No-FOUC: set theme early (light/dark) --}}
   <script>
     (function () {
       const KEY = 'vel-theme';
@@ -20,56 +20,23 @@
     })();
   </script>
 
-  {{-- ===================== LUXE MINIMAL THEME ===================== --}}
+  {{-- Dynamic theme variables (served from DB settings). See ThemeController@css --}}
+  <link rel="stylesheet" href="{{ route('theme.css') }}?v={{ \App\Models\Setting::get('theme.version','1') }}">
+
+  {{-- Component styles (use CSS vars from theme.css) --}}
   <style>
-    :root{
-      /* لوحة الألوان (فاتح) */
-      --gold:#F0C24B;               /* الذهب الأساسي */
-      --gold-2:#FFDFA1;             /* ذهبي ناعم */
-      --gold-deep:#D9A92F;
-      --bg:#F5F2EC;                 /* خلفية كريمية */
-      --surface:#FFF7ED;            /* طبقات */
-      --text:#111216;               /* فحم */
-      --muted:#6F7480;              /* رمادي ناعم */
-      --glass:rgba(255,255,255,.58);
-      --glass-strong:rgba(255,255,255,.72);
-      --border:rgba(17,18,22,0.08);
-      --ring:rgba(240,194,75,.28);
-      --shadow:0 18px 50px rgba(17,18,22,.08);
-      --radius:18px;
-      --speed:280ms;
-
-      /* تدرّج ذهبي للاستخدام العام */
-      --accent-grad: linear-gradient(135deg, #FFF0B3 0%, var(--gold) 35%, #F5CC52 60%, var(--gold-deep) 100%);
-      --bg-grad:
-        radial-gradient(1100px 540px at 12% -10%, rgba(240,194,75,.06), transparent 60%),
-        radial-gradient(900px 600px at 120% 0%, rgba(240,194,75,.05), transparent 55%);
-    }
-    html[data-theme="dark"]{
-      /* لوحة الألوان (داكن) */
-      --bg:#0F1115;
-      --surface:#161A20;
-      --text:#ECEEF2;
-      --muted:#A9B0B8;
-      --glass:rgba(22,26,32,.52);
-      --glass-strong:rgba(22,26,32,.70);
-      --border:rgba(255,255,255,0.08);
-      --ring:rgba(240,194,75,.38);
-      --shadow:0 24px 60px rgba(0,0,0,.45);
-
-      /* تدرّج ذهبي أكثر عمقاً */
-      --accent-grad: linear-gradient(135deg, #8A6D1F 0%, #C9A133 40%, #F0C24B 70%, #D9A92F 100%);
-      --bg-grad:
-        radial-gradient(1100px 540px at 12% -10%, rgba(240,194,75,.08), transparent 60%),
-        radial-gradient(900px 600px at 120% 0%, rgba(240,194,75,.06), transparent 55%);
-    }
-
     body{
       background: var(--bg-grad), var(--bg);
-      color:var(--text);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* ===== NAVBAR (زجاجي مع ظل حلقي) ===== */
+    html {
+      background: var(--bg);
+    }
+
+    /* NAVBAR (glassy) */
     .vel-nav{
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -79,7 +46,6 @@
     }
     .navbar-brand,.nav-link{ color:var(--text)!important; }
     .nav-link:hover{ color:#FFC94D!important; }
-
     .navbar .form-control{
       background: var(--glass);
       color: var(--text);
@@ -87,8 +53,15 @@
       border-radius: 999px;
     }
     .navbar .form-control::placeholder{ color:var(--muted); }
+    .navbar-toggler{ color:var(--text); border-color:var(--border); }
+    .navbar-toggler-icon{
+      background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(17,18,22,.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    html[data-theme="dark"] .navbar-toggler-icon{
+      background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(236,238,242,.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
 
-    /* أزرار ذهبية */
+    /* Buttons */
     .btn-vel-gold{
       background: var(--accent-grad);
       color:#111216;
@@ -100,6 +73,7 @@
     .btn-vel-outline{
       color:var(--text); border-color:var(--gold); border-width:1px;
       background:linear-gradient(90deg, rgba(240,194,75,.12), transparent);
+      transition:transform var(--speed) ease, box-shadow var(--speed) ease, background var(--speed) ease;
     }
     .btn-vel-outline:hover{
       background:linear-gradient(90deg, rgba(240,194,75,.18), transparent 70%);
@@ -107,11 +81,11 @@
       transform:translateY(-2px);
     }
 
-    /* ألواح وزجاج */
+    /* Glass & panels */
     .panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); }
     .glass{ background:var(--glass)!important; border:1px solid var(--border); border-radius:var(--radius); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); box-shadow:var(--shadow); }
 
-    /* فوتر */
+    /* Footer */
     .vel-footer{
       background:
         radial-gradient(800px 400px at 95% 0%, rgba(240,194,75,.06), transparent 60%),
@@ -122,7 +96,7 @@
     .footer-link{ color:var(--text); text-decoration:none; }
     .footer-link:hover{ color:#FFC94D; }
 
-    /* واتساب: أيقونة و FAB */
+    /* WhatsApp icon & FAB */
     .wa-icon{
       --c:#25D366;
       display:inline-block; width:1em; height:1em; background:var(--c);
@@ -140,11 +114,9 @@
     }
     .wa-fab:hover{ transform:translateY(-3px); background:var(--glass); }
 
-    /* عناصر عامة للانيميشن */
+    /* Animations & cards */
     .reveal{ opacity:0; transform:translateY(14px); transition:opacity 600ms ease, transform 600ms ease; }
     .reveal.visible{ opacity:1; transform:translateY(0); }
-
-    /* حركات بطاقات فاخرة (tilt/lift) */
     .luxe-card{ background:var(--glass); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); transition:transform .28s ease, box-shadow .28s ease; will-change:transform; }
     .luxe-card:hover{ transform:translateY(-6px); box-shadow:0 24px 60px rgba(0,0,0,.16); }
     .luxe-thumb{ aspect-ratio:1/1; border-radius: calc(var(--radius) - 6px); overflow:hidden; background:var(--surface); }
@@ -152,20 +124,34 @@
     .luxe-card:hover .luxe-thumb img{ transform:scale(1.04); filter:saturate(1.04) contrast(1.02); }
   </style>
 
+  @php
+    $siteName = $siteName ?? (\App\Models\Setting::get('site.name','MyStore') ?? 'MyStore');
+    $logoPath = \App\Models\Setting::get('site.logo_light');
+    $favicon  = \App\Models\Setting::get('site.favicon');
+  @endphp
+
+  @if($favicon)
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $favicon) }}">
+  @endif
+
   @stack('styles')
 </head>
 <body>
 
 @php
-  $siteName = $siteName ?? (\App\Models\Setting::get('site.name','MyStore') ?? 'MyStore');
   $waNumber = \App\Models\Setting::get('site.whatsapp','15551234567');
   $waText   = urlencode('Hello! I need assistance.');
 @endphp
 
-{{-- ================= NAVBAR ================= --}}
+{{-- NAVBAR --}}
 <nav class="navbar navbar-expand-lg vel-nav sticky-top">
   <div class="container py-1">
-    <a class="navbar-brand fw-semibold" href="/">{{ $siteName }}</a>
+    <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="/">
+      @if($logoPath)
+        <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ $siteName }}" style="height:28px; width:auto;">
+      @endif
+      <span>{{ $siteName }}</span>
+    </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
             aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,6 +162,7 @@
       {{-- Links --}}
       <ul class="navbar-nav me-3 mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('categories.index') }}">Categories</a></li>
       </ul>
 
       {{-- Search --}}
@@ -197,10 +184,10 @@
   </div>
 </nav>
 
-{{-- ================= PAGE CONTENT ================= --}}
+{{-- PAGE CONTENT --}}
 @yield('content')
 
-{{-- ================= FOOTER ================= --}}
+{{-- FOOTER --}}
 <footer class="vel-footer mt-5 pt-5">
   <div class="container pb-4">
     <div class="row g-4">
@@ -248,7 +235,9 @@
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pb-4">
       <div class="small text-muted">&copy; {{ date('Y') }} {{ $siteName }} — All rights reserved.</div>
-      <div class="small text-muted mt-2 mt-md-0">Crafted with <span style="background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent;">Luxe Gradient</span></div>
+      <div class="small text-muted mt-2 mt-md-0">
+        Crafted with <span style="background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent;">Luxe Gradient</span>
+      </div>
     </div>
   </div>
 </footer>
@@ -261,7 +250,7 @@
 {{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-{{-- =================== Theme Manager + FX =================== --}}
+{{-- Theme Manager + FX --}}
 <script>
 (function () {
   const KEY  = 'vel-theme';
@@ -297,7 +286,7 @@
     });
   } catch (_) {}
 
-  // toggles
+  // theme toggles
   const toggles = [
     document.getElementById('velToggleNav'),
     ...document.querySelectorAll('[data-theme-toggle]')
@@ -308,7 +297,7 @@
     apply(next);
   }));
 
-  // pressed effect for luxe buttons
+  // pressed effect for gold buttons
   document.addEventListener('mousedown',e=>{
     const btn=e.target.closest('.btn-vel-gold'); if(!btn) return;
     btn.classList.add('pressed');

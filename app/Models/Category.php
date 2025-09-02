@@ -3,36 +3,76 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Orchid\Screen\AsSource;
 use Orchid\Filters\Filterable;
+use App\Traits\HasImages;
+use App\Models\Product;
 
 class Category extends Model
 {
-    use AsSource, Filterable;
+    use AsSource, Filterable, HasImages;
 
     protected $fillable = [
         'parent_id', 'name', 'slug', 'description', 'is_active', 'sort_order',
     ];
 
-    // لأوركيد (اختياري)
+    // For Orchid tables
     protected $allowedSorts   = ['name', 'is_active', 'sort_order', 'created_at'];
     protected $allowedFilters = ['name', 'is_active'];
 
-    // علاقات
+    // Computed attributes
+    protected $appends = ['image_url'];
+
+    // Relationships
     public function parent()   { return $this->belongsTo(self::class, 'parent_id'); }
     public function children() { return $this->hasMany(self::class, 'parent_id'); }
+    public function products() { return $this->hasMany(Product::class); }
 
-    /* ==== السكوبات المطلوبة للهوم ==== */
+    /* ==== Required scopes for home page ==== */
 
-    // يعيد التصنيفات المفعّلة فقط
+    // Return only active categories
     public function scopeActive($q)
     {
         return $q->where('is_active', true);
     }
 
-    // يعيد التصنيفات الرئيسية فقط (بدون أب)
+    // Return only top-level categories (without parent)
     public function scopeTopLevel($q)
     {
         return $q->whereNull('parent_id');
+    }
+
+    /**
+     * Override trait methods for category-specific configuration
+     */
+    protected function getImageDirectory(): string
+    {
+        return 'categories';
+    }
+
+    protected function getImageFallback(): ?string
+    {
+        return 'images/placeholder-category.png';
+    }
+
+    /**
+     * Override the image URL generation to ensure proper host
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return asset($this->getImageFallback());
+        }
+
+        $imageService = app(\App\Services\ImageService::class);
+        $url = $imageService->getUrl($this->image_path, $this->getImageFallback());
+
+        // Always use 127.0.0.1:8000 for local development
+        if (str_contains($url, 'localhost')) {
+            $url = str_replace('localhost', '127.0.0.1:8000', $url);
+        }
+
+        return $url;
     }
 }

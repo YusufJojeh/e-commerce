@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Orchid\Screen\AsSource;
 use Orchid\Filters\Filterable;
+use App\Traits\HasImages;
 
 class Offer extends Model
 {
-    use AsSource, Filterable;
+    use AsSource, Filterable, HasImages;
 
     protected $fillable = [
         'title','description','type','value','starts_at','ends_at','is_active','banner_image','cta_url',
@@ -21,13 +23,40 @@ class Offer extends Model
         'value'     => 'float',
     ];
 
-    // table name is "offer_product" by default; adjust if yours is different
+    // For Orchid tables
+    protected $allowedSorts   = ['title','type','value','starts_at','ends_at','is_active','created_at'];
+    protected $allowedFilters = ['title','type','is_active'];
+
+    // Computed attributes
+    protected $appends = ['banner_url'];
+
+    /**
+     * Get the banner URL attribute
+     */
+    public function getBannerUrlAttribute(): ?string
+    {
+        if (!$this->banner_image) {
+            return null;
+        }
+
+        $imageService = app(\App\Services\ImageService::class);
+        $url = $imageService->getUrl($this->banner_image);
+
+        // Always use 127.0.0.1:8000 for local development
+        if (str_contains($url, 'localhost')) {
+            $url = str_replace('localhost', '127.0.0.1:8000', $url);
+        }
+
+        return $url;
+    }
+
+    // Table name is "offer_product" by default; adjust if yours is different
     public function products()
     {
         return $this->belongsToMany(Product::class, 'offer_product');
     }
 
-    // handy scope if not already present
+    // Handy scope if not already present
     public function scopeCurrent($q)
     {
         $now = now();
@@ -40,7 +69,16 @@ class Offer extends Model
                  });
     }
 
-    // For Orchid tables (optional)
-    protected $allowedSorts   = ['title','type','value','starts_at','ends_at','is_active','created_at'];
-    protected $allowedFilters = ['title','type','is_active'];
+    /**
+     * Override trait methods for offer-specific configuration
+     */
+    protected function getImagePathField(): string
+    {
+        return 'banner_image';
+    }
+
+    protected function getImageDirectory(): string
+    {
+        return 'offers';
+    }
 }

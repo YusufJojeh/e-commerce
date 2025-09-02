@@ -1,21 +1,18 @@
-@php
-  $img = optional($p->primaryImage)->path ? asset('storage/'. $p->primaryImage->path) : asset('storage/products/sample.jpg');
-@endphp
-
-<a href="{{ route('products.show', $p->slug) }}" class="card h-100 text-decoration-none">
-  <img src="{{ $img }}" class="card-img-top" alt="{{ $p->name }}" loading="lazy">
-  <div class="card-body">
-    <div class="small text-muted">
-      @if($p->brand) <span>{{ $p->brand->name }}</span> @endif
-      @if($p->category) <span>• {{ $p->category->name }}</span> @endif
-    </div>
-    <div class="fw-semibold">{{ $p->name }}</div>
-    <div class="mt-1">
-      @if($p->sale_price)
-        <span class="fw-bold">{{ number_format($p->sale_price, 2) }}</span>
-        <span class="text-muted text-decoration-line-through small">{{ number_format($p->price, 2) }}</span>
+<a href="{{ route('products.show', $p->slug) }}" class="card product-card h-100 text-decoration-none">
+  <div class="thumb">
+    <img src="{{ $p->primary_image_url }}" alt="{{ $p->name }}" loading="lazy">
+  </div>
+  <div class="card-body d-flex flex-column">
+    <div class="fw-semibold text-truncate mb-1">{{ $p->name }}</div>
+    @if($p->brand)
+      <div class="small text-muted mb-1">{{ $p->brand->name }}</div>
+    @endif
+    <div class="small mt-auto">
+      @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
+        <span class="price-cut me-1">{{ number_format($p->price, 2) }}</span>
+        <span class="fw-semibold text-success">{{ number_format($p->sale_price, 2) }}</span>
       @else
-        <span class="fw-bold">{{ number_format($p->price, 2) }}</span>
+        <span class="fw-semibold">{{ number_format($p->price, 2) }}</span>
       @endif
     </div>
   </div>
