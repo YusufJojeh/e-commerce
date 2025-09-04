@@ -14,6 +14,27 @@ Route::get('/product/{slug}', [CatalogController::class, 'show'])->name('product
 Route::get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
 Route::get('/category/{slug}', [CatalogController::class, 'category'])->name('categories.show');
 Route::get('/brand/{slug}', [CatalogController::class, 'brand'])->name('brands.show');
+
+// Additional routes
+Route::get('/brands', [CatalogController::class, 'brands'])->name('brands.index');
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+Route::get('/faq', function () {
+    return view('faq');
+})->name('faq');
+
+// Additional legal pages
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+Route::get('/terms-of-service', function () {
+    return view('terms-of-service');
+})->name('terms-of-service');
+
 Route::get('/theme.css', ThemeCssController::class)->name('theme.css');
 
 // Home Visibility API Routes
@@ -24,3 +45,31 @@ Route::prefix('api/home')->group(function () {
     Route::post('/visibility/bulk', [HomeVisibilityController::class, 'bulkUpdateVisibility'])->name('api.home.visibility.bulk');
     Route::post('/visibility/toggle/{section}', [HomeVisibilityController::class, 'toggleVisibility'])->name('api.home.visibility.toggle');
 });
+
+Route::get('/locale/{locale}', function (string $locale) {
+    if (! in_array($locale, ['ar', 'en'])) {
+        abort(404);
+    }
+    session(['locale' => $locale]);
+    // رجّع المستخدم لنفس الصفحة السابقة
+    return back();
+})->name('locale.switch');
+
+// Test route for translations
+Route::get('/test-translations', function () {
+    return [
+        'en' => [
+            'brand_titles_create' => __('brand.titles.create'),
+            'brand_actions_save' => __('brand.actions.save'),
+            'brand_fields_name' => __('brand.fields.name'),
+        ],
+        'ar' => [
+            'brand_titles_create' => __('brand.titles.create'),
+            'brand_actions_save' => __('brand.actions.save'),
+            'brand_fields_name' => __('brand.fields.name'),
+        ],
+        'current_locale' => app()->getLocale(),
+        'session_locale' => session('locale'),
+        'fallback_locale' => config('app.fallback_locale'),
+    ];
+})->name('test.translations');

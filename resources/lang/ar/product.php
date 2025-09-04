@@ -1,0 +1,71 @@
+<?php
+
+return [
+    'titles' => [
+        'create' => 'إضافة منتج جديد',
+        'edit' => 'تعديل المنتج',
+    ],
+    'fields' => [
+        'category_id' => 'التصنيف',
+        'brand_id' => 'العلامة التجارية',
+        'name' => 'الاسم',
+        'slug' => 'الرابط (Slug)',
+        'sku' => 'رمز المنتج',
+        'price' => 'السعر',
+        'sale_price' => 'سعر التخفيض',
+        'stock_qty' => 'الكمية المتوفرة',
+        'is_featured' => 'مميز',
+        'is_active' => 'مفعل',
+        'published_at' => 'تاريخ النشر',
+        'short_description' => 'الوصف المختصر',
+        'description' => 'الوصف',
+    ],
+    'help' => [
+        'slug' => 'معرّف URL فريد',
+        'sale_price' => 'اتركه فارغ إذا لم يكن هناك تخفيض',
+        'stock_qty' => 'اتركه فارغ للإنتاج غير المحدود',
+    ],
+    'sections' => [
+        'basic_info' => 'المعلومات الأساسية',
+        'description' => 'الوصف',
+        'images' => 'الصور',
+        'add_image' => 'إضافة صورة جديدة',
+    ],
+    'image_fields' => [
+        'file' => 'ملف الصورة',
+        'alt' => 'النص البديل (اختياري)',
+        'is_primary' => 'أساسية؟',
+        'sort_order' => 'الترتيب',
+    ],
+    'image_help' => 'قم برفع صورة (JPG/PNG/WebP). الحجم الأقصى 5MB',
+    'table_columns' => [
+        'preview' => 'معاينة',
+        'alt' => 'النص البديل',
+        'primary' => 'أساسية',
+        'order' => 'الترتيب',
+        'actions' => 'الإجراءات',
+    ],
+    'image_actions' => [
+        'set_primary' => 'تعيين كأساسية',
+        'delete' => 'حذف',
+        'confirm_delete' => 'حذف هذه الصورة؟',
+    ],
+    'actions' => [
+        'save' => 'حفظ',
+        'remove' => 'حذف',
+        'confirm_remove' => 'حذف هذا المنتج؟',
+        'add_image' => 'إضافة صورة',
+    ],
+    'toast' => [
+        'saved' => 'تم الحفظ.',
+        'deleted' => 'تم الحذف.',
+        'delete_failed' => 'تعذر الحذف: :error',
+        'image_added' => 'تمت إضافة الصورة.',
+        'image_deleted' => 'تم حذف الصورة.',
+        'image_delete_failed' => 'تعذر حذف الصورة: :error',
+        'primary_updated' => 'تم تحديث الصورة الأساسية.',
+        'primary_update_failed' => 'تعذر تحديث الصورة الأساسية: :error',
+        'upload_failed' => 'فشل رفع الصورة: :error',
+    ],
+    'no_image' => 'لا توجد صورة',
+];

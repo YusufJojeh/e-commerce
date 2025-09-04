@@ -105,6 +105,17 @@ class CatalogController extends Controller
         return view('categories.show', compact('category', 'products', 'sort'));
     }
 
+    // /brands — All brands page
+    public function brands()
+    {
+        $brands = Brand::where('is_active', 1)
+            ->withCount('products')
+            ->orderBy('name')
+            ->get();
+
+        return view('brands.index', compact('brands'));
+    }
+
     // /brand/{slug} — سنفصلها بالخطوة القادمة
     public function brand(string $slug, Request $request)
     {

@@ -7,114 +7,106 @@ namespace App\Orchid;
 use Orchid\Platform\Dashboard;
 use Orchid\Platform\ItemPermission;
 use Orchid\Platform\OrchidServiceProvider;
-use Orchid\Screen\Actions\Menu;
+use Orchid\Screen\Actions\Menu; // ✅ موجود مسبقاً
 use Orchid\Support\Color;
 
 class PlatformProvider extends OrchidServiceProvider
 {
-    /**
-     * Bootstrap the application services.
-     */
     public function boot(Dashboard $dashboard): void
     {
         parent::boot($dashboard);
 
-        // ثيم ديناميكي قادم من الإعدادات (يؤثر على اللوحة والواجهة إن استخدمته هناك أيضاً)
         $dashboard->registerResource('stylesheets', '/theme.css');
-
-        // أي تخصيصات إضافية للوحة (اختياري)
         $dashboard->registerResource('stylesheets', '/css/platform-theme.css');
-
-        // Crystal theme enhancements for Orchid platform
         $dashboard->registerResource('stylesheets', '/css/crystal-platform.css');
-
-        // Custom JavaScript for platform animations
         $dashboard->registerResource('scripts', '/js/crystal-platform.js');
     }
 
     /**
-     * Register the application menu.
-     *
      * @return Menu[]
      */
     public function menu(): array
     {
         return [
             // ====== الرئيسي
-            Menu::make('Dashboard')
+            Menu::make(__('platform.menu.dashboard'))
                 ->icon('bs.house')
                 ->route('platform.index'),
 
             // ====== الكاتالوج
-            Menu::make('Catalog')->title('Catalog'),
+            Menu::make(__('platform.menu.catalog'))->title(__('platform.menu.catalog')),
 
-            Menu::make('Categories')
+            Menu::make(__('platform.menu.categories'))
                 ->icon('bs.collection')
                 ->route('platform.categories.list'),
 
-            Menu::make('Brands')
+            Menu::make(__('platform.menu.brands'))
                 ->icon('bs.tags')
                 ->route('platform.brands.list'),
 
-            Menu::make('Products')
+            Menu::make(__('platform.menu.products'))
                 ->icon('bs.box')
                 ->route('platform.products.list'),
 
-            Menu::make('Offers')
+            Menu::make(__('platform.menu.offers'))
                 ->icon('bs.ticket-perforated')
                 ->route('platform.offers.list'),
 
-            Menu::make('Slides')
+            Menu::make(__('platform.menu.slides'))
                 ->icon('bs.images')
                 ->route('platform.slides.list'),
 
             // ====== إعدادات الموقع
-            Menu::make('Site')->title('Site'),
+            Menu::make(__('platform.menu.site'))->title(__('platform.menu.site')),
 
-            Menu::make('Appearance')                // شاشة التحكم بالثيم/الألوان والشعارات
+            Menu::make(__('platform.menu.appearance'))
                 ->icon('bs.palette')
                 ->route('platform.appearance')
                 ->permission('manage.appearance'),
 
-            Menu::make('Settings')                  // إعدادات عامة
+            Menu::make(__('platform.menu.settings'))
                 ->icon('bs.gear')
                 ->route('platform.settings')
                 ->permission('manage.settings'),
 
-            Menu::make('Home Settings')             // إعدادات الصفحة الرئيسية (إن كنت تستخدمها)
+            Menu::make(__('platform.menu.home_settings'))
                 ->icon('bs.sliders')
                 ->route('platform.site.home')
                 ->permission('manage.settings'),
 
+            // ✅ أزرار تبديل اللغة كعناصر Menu (بدون Link::make)
+            Menu::make(__('common.ui.lang_ar'))
+                ->icon('bs.translate')
+                ->route('locale.switch', ['locale' => 'ar']),
+
+            Menu::make(__('common.ui.lang_en'))
+                ->icon('bs.translate')
+                ->route('locale.switch', ['locale' => 'en']),
+
             // ====== الصلاحيات
-            Menu::make(__('Users'))
+            Menu::make(__('platform.menu.users'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')
                 ->permission('platform.systems.users')
-                ->title(__('Access Controls')),
+                ->title(__('platform.menu.access_controls')),
 
-            Menu::make(__('Roles'))
+            Menu::make(__('platform.menu.roles'))
                 ->icon('bs.shield')
                 ->route('platform.systems.roles')
                 ->permission('platform.systems.roles'),
         ];
     }
 
-    /**
-     * Register permissions for the application.
-     *
-     * @return ItemPermission[]
-     */
     public function permissions(): array
     {
         return [
-            ItemPermission::group(__('System'))
-                ->addPermission('platform.systems.roles', __('Roles'))
-                ->addPermission('platform.systems.users', __('Users')),
+            ItemPermission::group(__('platform.permissions.system'))
+                ->addPermission('platform.systems.roles', __('platform.menu.roles'))
+                ->addPermission('platform.systems.users', __('platform.menu.users')),
 
-            ItemPermission::group('Settings')
-                ->addPermission('manage.settings', 'Manage Site Settings')
-                ->addPermission('manage.appearance', 'Manage Appearance & Branding'),
+            ItemPermission::group(__('platform.menu.settings'))
+                ->addPermission('manage.settings', __('platform.permissions.manage_settings'))
+                ->addPermission('manage.appearance', __('platform.permissions.manage_appearance')),
         ];
     }
 }

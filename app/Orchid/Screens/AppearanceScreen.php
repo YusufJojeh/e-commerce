@@ -57,6 +57,10 @@ class AppearanceScreen extends Screen
             'card_blur'        => Setting::get('theme.card.blur', '20'),
             'card_opacity'     => Setting::get('theme.card.opacity', '0.1'),
             'card_border'      => Setting::get('theme.card.border', '0.3'),
+
+            // Backup Status
+            'has_backup'       => Setting::get('theme.backup.working_style') ? true : false,
+            'backup_date'      => Setting::get('theme.backup.last_created') ? Setting::get('theme.backup.last_created') : null,
         ];
     }
 
@@ -69,7 +73,8 @@ class AppearanceScreen extends Screen
     {
         return [
             Button::make('Preview')->icon('bs.eye')->method('preview'),
-            Button::make('Reset to Defaults')->icon('bs.arrow-clockwise')->method('resetDefaults')->confirm('Are you sure you want to reset all appearance settings to defaults?'),
+            Button::make('Create Backup')->icon('bs.download')->method('createBackup')->confirm('Create a backup of current working style?'),
+            Button::make('Reset Options')->icon('bs.arrow-clockwise')->method('showResetOptions'),
             Button::make('Save')->icon('bs.check')->method('save'),
         ];
     }
@@ -314,6 +319,40 @@ class AppearanceScreen extends Screen
                     ->help($faviconHelp),
             ])->title('🏷️ Brand Assets'),
 
+            // Reset Options
+            Layout::rows([
+                // Empty row to create a titled section
+            ])->title('🔄 Reset Options'),
+
+            // Backup Status
+            Layout::rows([
+                // This will show backup status
+            ])->title('💾 Backup Status'),
+            Layout::rows([
+                // Backup status will be displayed here
+            ])->title('Backup Information'),
+
+            Layout::rows([
+                Button::make('Reset to Working Style')
+                    ->icon('bs.arrow-clockwise')
+                    ->method('resetToWorkingStyle')
+                    ->confirm('Are you sure you want to restore your last working style? This will overwrite all current changes.')
+                    ->class('btn-warning')
+                    ->canSee($this->query()['has_backup']),
+
+                Button::make('Reset to Defaults')
+                    ->icon('bs.arrow-clockwise')
+                    ->method('resetDefaults')
+                    ->confirm('Are you sure you want to reset all appearance settings to factory defaults? This cannot be undone.')
+                    ->class('btn-danger'),
+
+                Button::make('Create Backup Now')
+                    ->icon('bs.download')
+                    ->method('createBackup')
+                    ->confirm('Create a backup of current working style?')
+                    ->class('btn-info'),
+            ])->title('Reset & Backup Options'),
+
             // Live Preview
             Layout::rows([
                 // Empty row to create a titled section
@@ -324,6 +363,11 @@ class AppearanceScreen extends Screen
 
     public function save(Request $request)
     {
+        // Auto-create backup before saving if no backup exists
+        if (!Setting::get('theme.backup.working_style')) {
+            $this->createBackup();
+        }
+
         $imageService = app(ImageService::class);
 
         $data = $request->validate([
@@ -333,14 +377,14 @@ class AppearanceScreen extends Screen
             'theme_success'    => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'theme_warning'    => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'theme_error'      => ['required','regex:/^#[0-9A-F]{6}$/i'],
-            
+
             // Gradient Settings
             'theme_grad_start' => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'theme_grad_end'   => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'gradient_type'    => ['required','in:linear,radial,conic'],
             'gradient_angle'   => ['required','integer','min:0','max:360'],
             'gradient_custom'  => ['nullable','string'],
-            
+
             // Light Theme Colors
             'light_bg'         => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'light_surface'    => ['required','regex:/^#[0-9A-F]{6}$/i'],
@@ -348,7 +392,7 @@ class AppearanceScreen extends Screen
             'light_muted'      => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'light_border'     => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'light_glass'      => ['required','string'],
-            
+
             // Dark Theme Colors
             'dark_bg'          => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'dark_surface'     => ['required','regex:/^#[0-9A-F]{6}$/i'],
@@ -356,20 +400,20 @@ class AppearanceScreen extends Screen
             'dark_muted'       => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'dark_border'      => ['required','regex:/^#[0-9A-F]{6}$/i'],
             'dark_glass'       => ['required','string'],
-            
+
             // Advanced Settings
             'border_radius'    => ['required','integer','min:0','max:50'],
             'shadow_intensity' => ['required','in:none,light,medium,heavy'],
             'animation_speed'  => ['required','numeric','min:0.1','max:2.0'],
-            
+
             // Card Styling
             'card_blur'        => ['required','integer','min:0','max:50'],
             'card_opacity'     => ['required','numeric','min:0','max:1'],
             'card_border'      => ['required','numeric','min:0','max:1'],
-            
+
             // Theme Preset
             'theme_preset'     => ['nullable','string'],
-            
+
             // File Uploads
             'logo_light_file'  => ['nullable','image','max:2048'], // 2MB
             'logo_dark_file'   => ['nullable','image','max:2048'], // 2MB
@@ -382,14 +426,14 @@ class AppearanceScreen extends Screen
         Setting::set('theme.success', $data['theme_success']);
         Setting::set('theme.warning', $data['theme_warning']);
         Setting::set('theme.error', $data['theme_error']);
-        
+
         // Save gradient settings
         Setting::set('theme.grad.start', $data['theme_grad_start']);
         Setting::set('theme.grad.end', $data['theme_grad_end']);
         Setting::set('theme.gradient.type', $data['gradient_type']);
         Setting::set('theme.gradient.angle', $data['gradient_angle']);
         Setting::set('theme.gradient.custom', $data['gradient_custom']);
-        
+
         // Save light theme colors
         Setting::set('theme.light.bg', $data['light_bg']);
         Setting::set('theme.light.surface', $data['light_surface']);
@@ -397,7 +441,7 @@ class AppearanceScreen extends Screen
         Setting::set('theme.light.muted', $data['light_muted']);
         Setting::set('theme.light.border', $data['light_border']);
         Setting::set('theme.light.glass', $data['light_glass']);
-        
+
         // Save dark theme colors
         Setting::set('theme.dark.bg', $data['dark_bg']);
         Setting::set('theme.dark.surface', $data['dark_surface']);
@@ -405,17 +449,17 @@ class AppearanceScreen extends Screen
         Setting::set('theme.dark.muted', $data['dark_muted']);
         Setting::set('theme.dark.border', $data['dark_border']);
         Setting::set('theme.dark.glass', $data['dark_glass']);
-        
+
         // Save advanced settings
         Setting::set('theme.border.radius', $data['border_radius']);
         Setting::set('theme.shadow.intensity', $data['shadow_intensity']);
         Setting::set('theme.animation.speed', $data['animation_speed']);
-        
+
         // Save card styling
         Setting::set('theme.card.blur', $data['card_blur']);
         Setting::set('theme.card.opacity', $data['card_opacity']);
         Setting::set('theme.card.border', $data['card_border']);
-        
+
         // Save theme preset
         if ($data['theme_preset']) {
             Setting::set('theme.preset', $data['theme_preset']);
@@ -488,6 +532,103 @@ class AppearanceScreen extends Screen
         return back();
     }
 
+    public function createBackup()
+    {
+        // Create a backup of current working style
+        $backup = [
+            'timestamp' => now()->toISOString(),
+            'description' => 'Backup created on ' . now()->format('M d, Y \a\t H:i'),
+            'settings' => [
+                // Brand Colors
+                'theme.primary' => Setting::get('theme.primary', '#F0C275'),
+                'theme.accent' => Setting::get('theme.accent', '#FF6B6B'),
+                'theme.success' => Setting::get('theme.success', '#10B981'),
+                'theme.warning' => Setting::get('theme.warning', '#F59E0B'),
+                'theme.error' => Setting::get('theme.error', '#EF4444'),
+
+                // Gradient Settings
+                'theme.grad.start' => Setting::get('theme.grad.start', '#F0C275'),
+                'theme.grad.end' => Setting::get('theme.grad.end', '#7877C6'),
+                'theme.gradient.type' => Setting::get('theme.gradient.type', 'linear'),
+                'theme.gradient.angle' => Setting::get('theme.gradient.angle', '135'),
+                'theme.gradient.custom' => Setting::get('theme.gradient.custom', ''),
+
+                // Light Theme Colors
+                'theme.light.bg' => Setting::get('theme.light.bg', '#F5F2EC'),
+                'theme.light.surface' => Setting::get('theme.light.surface', '#FFFFFF'),
+                'theme.light.text' => Setting::get('theme.light.text', '#1E293B'),
+                'theme.light.muted' => Setting::get('theme.light.muted', '#64748B'),
+                'theme.light.border' => Setting::get('theme.light.border', '#E2E8F0'),
+                'theme.light.glass' => Setting::get('theme.light.glass', 'rgba(255,255,255,0.8)'),
+
+                // Dark Theme Colors
+                'theme.dark.bg' => Setting::get('theme.dark.bg', '#0F1115'),
+                'theme.dark.surface' => Setting::get('theme.dark.surface', '#1E293B'),
+                'theme.dark.text' => Setting::get('theme.dark.text', '#F1F5F9'),
+                'theme.dark.muted' => Setting::get('theme.dark.muted', '#94A3B8'),
+                'theme.dark.border' => Setting::get('theme.dark.border', '#334155'),
+                'theme.dark.glass' => Setting::get('theme.dark.glass', 'rgba(255,255,255,0.1)'),
+
+                // Advanced Settings
+                'theme.border.radius' => Setting::get('theme.border.radius', '12'),
+                'theme.shadow.intensity' => Setting::get('theme.shadow.intensity', 'medium'),
+                'theme.animation.speed' => Setting::get('theme.animation.speed', '0.3'),
+
+                // Card Styling
+                'theme.card.blur' => Setting::get('theme.card.blur', '20'),
+                'theme.card.opacity' => Setting::get('theme.card.opacity', '0.1'),
+                'theme.card.border' => Setting::get('theme.card.border', '0.3'),
+
+                // Theme Preset
+                'theme.preset' => Setting::get('theme.preset', 'crystal'),
+            ]
+        ];
+
+        // Store backup in database
+        Setting::set('theme.backup.working_style', json_encode($backup));
+        Setting::set('theme.backup.last_created', now()->toISOString());
+
+        Toast::info('Backup of current working style created successfully!');
+        return back();
+    }
+
+    public function showResetOptions()
+    {
+        // Show a modal or redirect to a reset options page
+        // For now, we'll use a simple approach with session messages
+        session()->flash('show_reset_options', true);
+        Toast::info('Choose your reset option below.');
+        return back();
+    }
+
+    public function resetToWorkingStyle()
+    {
+        $backup = Setting::get('theme.backup.working_style');
+
+        if (!$backup) {
+            Toast::error('No working style backup found. Please create a backup first.');
+            return back();
+        }
+
+        $backupData = json_decode($backup, true);
+
+        if (!$backupData || !isset($backupData['settings'])) {
+            Toast::error('Backup data is corrupted. Please create a new backup.');
+            return back();
+        }
+
+        // Restore all settings from backup
+        foreach ($backupData['settings'] as $key => $value) {
+            Setting::set($key, $value);
+        }
+
+        // Clear CSS cache
+        cache()->forget('theme-css-hash');
+
+        Toast::info('Successfully restored to your working style from ' . $backupData['description']);
+        return back();
+    }
+
     public function resetDefaults()
     {
         // Reset all appearance settings to defaults
@@ -498,14 +639,14 @@ class AppearanceScreen extends Screen
             'theme.success' => '#10B981',
             'theme.warning' => '#F59E0B',
             'theme.error' => '#EF4444',
-            
+
             // Gradient Settings
             'theme.grad.start' => '#F0C275',
             'theme.grad.end' => '#7877C6',
             'theme.gradient.type' => 'linear',
             'theme.gradient.angle' => '135',
             'theme.gradient.custom' => '',
-            
+
             // Light Theme Colors
             'theme.light.bg' => '#F5F2EC',
             'theme.light.surface' => '#FFFFFF',
@@ -513,7 +654,7 @@ class AppearanceScreen extends Screen
             'theme.light.muted' => '#64748B',
             'theme.light.border' => '#E2E8F0',
             'theme.light.glass' => 'rgba(255,255,255,0.8)',
-            
+
             // Dark Theme Colors
             'theme.dark.bg' => '#0F1115',
             'theme.dark.surface' => '#1E293B',
@@ -521,17 +662,17 @@ class AppearanceScreen extends Screen
             'theme.dark.muted' => '#94A3B8',
             'theme.dark.border' => '#334155',
             'theme.dark.glass' => 'rgba(255,255,255,0.1)',
-            
+
             // Advanced Settings
             'theme.border.radius' => '12',
             'theme.shadow.intensity' => 'medium',
             'theme.animation.speed' => '0.3',
-            
+
             // Card Styling
             'theme.card.blur' => '20',
             'theme.card.opacity' => '0.1',
             'theme.card.border' => '0.3',
-            
+
             // Theme Preset
             'theme.preset' => 'crystal',
         ];

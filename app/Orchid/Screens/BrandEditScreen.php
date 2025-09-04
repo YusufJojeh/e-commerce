@@ -7,7 +7,6 @@ use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
@@ -31,16 +30,16 @@ class BrandEditScreen extends Screen
 
     public function name(): ?string
     {
-        return $this->brand?->exists ? 'Edit Brand' : 'Create Brand';
+        return $this->brand?->exists ? __('brand.titles.edit') : __('brand.titles.create');
     }
 
     public function commandBar(): array
     {
         return [
-            Button::make('Save')->icon('bs.check')->method('createOrUpdate'),
-            Button::make('Remove')
+            Button::make(__('brand.actions.save'))->icon('bs.check')->method('createOrUpdate'),
+            Button::make(__('brand.actions.remove'))
                 ->icon('bs.trash')
-                ->confirm('Delete this brand?')
+                ->confirm(__('brand.actions.confirm_remove'))
                 ->method('remove')
                 ->canSee($this->brand?->exists),
         ];
@@ -49,46 +48,42 @@ class BrandEditScreen extends Screen
     public function layout(): array
     {
         $logoHelp = $this->brand?->logo_url
-            ? 'Current: ' . $this->brand->logo_url
-            : 'Upload a brand logo (JPG/PNG/WebP). Max 3MB';
+            ? __('brand.help.logo_current_prefix') . $this->brand->logo_url
+            : __('brand.help.logo');
 
         return [
-            // Current logo display (only for existing brands)
             Layout::view('partials.current-image', [
-                'image_url' => $this->brand?->logo_url,
+                'image_url'  => $this->brand?->logo_url,
                 'image_path' => $this->brand?->logo_path,
-                'title' => 'Current Logo'
+                'title'      => __('brand.titles.current_logo')
             ])->canSee($this->brand?->exists && $this->brand?->logo_path),
 
             Layout::rows([
-                Input::make('brand.name')
-                    ->title('Name')
-                    ->required(),
+                Input::make('brand.name')->title(__('brand.fields.name'))->required(),
 
                 Input::make('brand.slug')
-                    ->title('Slug')
-                    ->help('Unique URL identifier')
+                    ->title(__('brand.fields.slug'))
+                    ->help(__('brand.help.slug'))
                     ->required(),
 
-                // Logo upload (real file, not URL)
                 Input::make('logo')
                     ->type('file')
-                    ->title('Logo')
+                    ->title(__('brand.fields.logo'))
                     ->acceptedFiles('image/*')
                     ->help($logoHelp),
 
                 Switcher::make('brand.is_external')
-                    ->title('External brand')
+                    ->title(__('brand.fields.is_external'))
                     ->sendTrueOrFalse()
                     ->value($this->brand?->exists ? (bool)$this->brand->is_external : false),
 
                 Switcher::make('brand.is_active')
-                    ->title('Active')
+                    ->title(__('brand.fields.is_active'))
                     ->sendTrueOrFalse()
                     ->value($this->brand?->exists ? (bool)$this->brand->is_active : true),
 
                 Input::make('brand.sort_order')
-                    ->title('Order')
+                    ->title(__('brand.fields.sort_order'))
                     ->type('number')
                     ->value($this->brand?->sort_order ?? 0),
             ]),
@@ -99,7 +94,7 @@ class BrandEditScreen extends Screen
     {
         $imageService = app(ImageService::class);
 
-        $validationRules = [
+        $rules = [
             'brand.name'        => ['required','string','max:255'],
             'brand.slug'        => ['required','string','max:255', Rule::unique('brands','slug')->ignore($brand->id)],
             'brand.is_external' => ['nullable','boolean'],
@@ -107,11 +102,11 @@ class BrandEditScreen extends Screen
             'brand.sort_order'  => ['nullable','integer'],
         ];
 
-        // Add logo validation rules
+        // قواعد الشعار من خدمة الصور
         $logoRules = $imageService->getValidationRules('logo', false);
-        $validationRules = array_merge($validationRules, $logoRules);
+        $rules = array_merge($rules, $logoRules);
 
-        $data = $request->validate($validationRules);
+        $data = $request->validate($rules);
 
         if (blank($data['brand']['slug'])) {
             $data['brand']['slug'] = Str::slug($data['brand']['name']);
@@ -119,37 +114,35 @@ class BrandEditScreen extends Screen
 
         $brand->fill($data['brand']);
 
-        // Store logo in public/brands and delete old one
+        // رفع الشعار وتحديث المسار
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $uploadOptions = $imageService->getUploadOptions('brands');
+            $uploadOptions = $imageService->getUploadOptions('brands'); // مثال: ['max' => 3072, 'webp' => true] إلخ
 
             $result = $imageService->upload($file, 'brands', $uploadOptions);
 
-            if ($result['success']) {
+            if ($result['success'] ?? false) {
                 $brand->logo_path = $result['path'];
             } else {
-                Toast::error('Logo upload failed: ' . $result['error']);
+                Toast::error(__('brand.toast.upload_failed', ['error' => $result['error'] ?? 'unknown']));
                 return back();
             }
         }
 
         $brand->save();
 
-        Toast::info('Saved.');
+        Toast::info(__('brand.toast.saved'));
         return redirect()->route('platform.brands.list');
     }
 
     public function remove(Brand $brand)
     {
         try {
-            // Logo will be automatically deleted via model events
             $brand->delete();
-
-            Toast::info('Deleted.');
+            Toast::info(__('brand.toast.deleted'));
             return redirect()->route('platform.brands.list');
         } catch (\Throwable $e) {
-            Toast::error('Cannot delete: ' . $e->getMessage());
+            Toast::error(__('brand.toast.delete_failed', ['error' => $e->getMessage()]));
             return back();
         }
     }

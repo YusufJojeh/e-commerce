@@ -20,33 +20,29 @@ use Orchid\Support\Facades\Toast;
 
 class CategoryEditScreen extends Screen
 {
-    // Allow property to be nullable to avoid initialization error
     public ?Category $category = null;
 
     public function query(Category $category): array
     {
         $this->category = $category;
-
-        return [
-            'category' => $category,
-        ];
+        return [ 'category' => $category ];
     }
 
     public function name(): ?string
     {
-        return $this->category?->exists ? 'Edit Category' : 'Create Category';
+        return $this->category?->exists ? 'تعديل التصنيف' : 'إضافة تصنيف جديد';
     }
 
     public function commandBar(): array
     {
         return [
-            Button::make('Save')
+            Button::make('حفظ')
                 ->icon('bs.check')
                 ->method('createOrUpdate'),
 
-            Button::make('Remove')
+            Button::make('حذف')
                 ->icon('bs.trash')
-                ->confirm('Delete this category?')
+                ->confirm('هل أنت متأكد أنك تريد حذف هذا التصنيف؟')
                 ->method('remove')
                 ->canSee($this->category?->exists),
         ];
@@ -55,51 +51,49 @@ class CategoryEditScreen extends Screen
     public function layout(): array
     {
         $imageHelp = $this->category?->image_url
-            ? 'Current: ' . $this->category->image_url
-            : 'Upload a category image (JPG/PNG/WebP). Max 3MB';
+            ? 'الصورة الحالية: ' . $this->category->image_url
+            : 'قم برفع صورة للتصنيف (JPG/PNG/WebP). الحجم الأقصى 3MB';
 
         return [
-            // Current image display (only for existing categories)
             Layout::view('partials.current-image', [
                 'image_url' => $this->category?->image_url,
                 'image_path' => $this->category?->image_path,
-                'title' => 'Current Image'
+                'title' => 'الصورة الحالية'
             ])->canSee($this->category?->exists && $this->category?->image_path),
 
             Layout::rows([
                 Select::make('category.parent_id')
-                    ->title('Parent')
-                    ->empty('— None —')
+                    ->title('التصنيف الأب')
+                    ->empty('— بدون —')
                     ->fromModel(Category::class, 'name', 'id')
-                    ->help('Optional parent category'),
+                    ->help('يمكنك تركه فارغ إذا لم يكن للتصنيف أب'),
 
                 Input::make('category.name')
-                    ->title('Name')
+                    ->title('اسم التصنيف')
                     ->required(),
 
                 Input::make('category.slug')
-                    ->title('Slug')
-                    ->help('Unique URL identifier')
+                    ->title('الرابط (Slug)')
+                    ->help('معرّف URL فريد')
                     ->required(),
 
                 TextArea::make('category.description')
-                    ->title('Description')
+                    ->title('الوصف')
                     ->rows(3),
 
-                // Real image upload field
                 Input::make('image')
                     ->type('file')
-                    ->title('Image')
+                    ->title('الصورة')
                     ->acceptedFiles('image/*')
                     ->help($imageHelp),
 
                 Switcher::make('category.is_active')
-                    ->title('Active')
+                    ->title('مفعل')
                     ->sendTrueOrFalse()
                     ->value($this->category?->exists ? (bool)$this->category->is_active : true),
 
                 Input::make('category.sort_order')
-                    ->title('Order')
+                    ->title('الترتيب')
                     ->type('number')
                     ->value((int)($this->category->sort_order ?? 0)),
             ]),
@@ -122,25 +116,21 @@ class CategoryEditScreen extends Screen
             'category.sort_order'  => ['nullable','integer'],
         ];
 
-        // Add image validation rules
         $imageRules = $imageService->getValidationRules('image', false);
         $validationRules = array_merge($validationRules, $imageRules);
 
         $data = $request->validate($validationRules);
 
-        // Secure slug
         if (blank($data['category']['slug'])) {
             $data['category']['slug'] = Str::slug($data['category']['name']);
         }
 
-        // Prevent selecting itself as parent
         if (!empty($data['category']['parent_id']) && (int)$data['category']['parent_id'] === (int)$category->id) {
-            return back()->withErrors(['category.parent_id' => 'Category cannot be a parent of itself.']);
+            return back()->withErrors(['category.parent_id' => 'لا يمكن أن يكون التصنيف أبًا لنفسه.']);
         }
 
         $category->fill($data['category']);
 
-        // Upload and store image in storage/app/public/categories
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $uploadOptions = $imageService->getUploadOptions('categories');
@@ -150,27 +140,25 @@ class CategoryEditScreen extends Screen
             if ($result['success']) {
                 $category->image_path = $result['path'];
             } else {
-                Toast::error('Image upload failed: ' . $result['error']);
+                Toast::error('فشل رفع الصورة: ' . $result['error']);
                 return back();
             }
         }
 
         $category->save();
 
-        Toast::info('Saved.');
+        Toast::info('تم الحفظ بنجاح.');
         return redirect()->route('platform.categories.list');
     }
 
     public function remove(Category $category)
     {
         try {
-            // Image will be automatically deleted via model events
             $category->delete();
-
-            Toast::info('Deleted.');
+            Toast::info('تم الحذف بنجاح.');
             return redirect()->route('platform.categories.list');
         } catch (\Throwable $e) {
-            Toast::error('Cannot delete: ' . $e->getMessage());
+            Toast::error('تعذر الحذف: ' . $e->getMessage());
             return back();
         }
     }
