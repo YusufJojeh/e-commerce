@@ -3,55 +3,9 @@
 @section('title', 'About Us - ' . ($siteName ?? 'MyStore'))
 
 @push('styles')
+@include('partials.unified-styles')
 <style>
-  .about-header {
-    background: linear-gradient(135deg, rgba(240,194,75,0.1) 0%, rgba(120,119,198,0.1) 100%);
-    border-radius: 24px;
-    padding: 4rem 2rem;
-    margin-bottom: 3rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .about-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
-  }
-
-  .about-title {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--text) 0%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 1rem;
-  }
-
-  .about-subtitle {
-    color: var(--muted);
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .story-section {
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 3rem 2rem;
-    margin-bottom: 3rem;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  }
+  /* About Page Specific Styles */
 
   .story-content {
     max-width: 800px;
@@ -68,31 +22,6 @@
 
   .values-section {
     margin-bottom: 3rem;
-  }
-
-  .section-title {
-    font-family: 'Georgia', serif;
-    font-weight: 700;
-    font-size: 2.5rem;
-    background: linear-gradient(135deg, var(--text) 0%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    position: relative;
-    margin-bottom: 3rem;
-    text-align: center;
-  }
-
-  .section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    border-radius: 2px;
   }
 
   .value-card {
@@ -136,35 +65,6 @@
   .value-description {
     color: var(--muted);
     line-height: 1.6;
-  }
-
-  .stats-section {
-    background: linear-gradient(135deg, rgba(240,194,75,0.1) 0%, rgba(120,119,198,0.1) 100%);
-    border-radius: 24px;
-    padding: 3rem 0;
-    margin: 3rem 0;
-  }
-
-  .stat-item {
-    text-align: center;
-    padding: 1rem;
-  }
-
-  .stat-number {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--gold), #ff6b6b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-label {
-    color: var(--muted);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
   .team-section {
@@ -221,26 +121,6 @@
     line-height: 1.6;
   }
 
-  .cta-section {
-    background: linear-gradient(135deg, rgba(240,194,75,0.15) 0%, rgba(120,119,198,0.15) 100%);
-    border-radius: 24px;
-    padding: 4rem 2rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .cta-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
-  }
-
   .cta-title {
     font-size: 2.5rem;
     font-weight: 700;
@@ -256,62 +136,46 @@
     margin-left: auto;
     margin-right: auto;
   }
-
-  /* Dark mode enhancements */
-  html[data-theme="dark"] .about-header {
-    background: linear-gradient(135deg, rgba(240,194,75,0.15) 0%, rgba(120,119,198,0.15) 100%);
-  }
-
-  html[data-theme="dark"] .story-section,
-  html[data-theme="dark"] .value-card,
-  html[data-theme="dark"] .team-card {
-    background: rgba(26,26,26,0.8);
-    border-color: rgba(255,255,255,0.1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  }
-
-  html[data-theme="dark"] .stats-section {
-    background: linear-gradient(135deg, rgba(240,194,75,0.15) 0%, rgba(120,119,198,0.15) 100%);
-  }
-
-  html[data-theme="dark"] .cta-section {
-    background: linear-gradient(135deg, rgba(240,194,75,0.2) 0%, rgba(120,119,198,0.2) 100%);
-  }
 </style>
 @endpush
 
 @section('content')
 
 {{-- About Header --}}
-<section class="about-header reveal">
-  <div class="container position-relative">
-    <h1 class="about-title">About {{ $siteName ?? 'MyStore' }}</h1>
-    <p class="about-subtitle">
-      We're passionate about delivering exceptional products and experiences to our customers.
+<div class="container py-4">
+  <div class="page-header text-center mb-5">
+    <h1 class="page-title">About {{ $siteName ?? 'MyStore' }}</h1>
+    <p class="page-subtitle text-muted">
+      {{ __('common.messages.passionate_about_delivering') }}
     </p>
   </div>
-</section>
 
 {{-- Our Story --}}
 <section class="py-5 reveal">
   <div class="container">
-    <div class="story-section">
+    <div class="content-card">
       <div class="story-content">
-        <h2 class="section-title">Our Story</h2>
-        <p class="story-text">
-          Founded with a vision to revolutionize the shopping experience, {{ $siteName ?? 'MyStore' }} has been at the forefront of innovation in e-commerce.
-          What started as a small local business has grown into a trusted destination for quality products and exceptional service.
-        </p>
-        <p class="story-text">
-          Our journey began with a simple belief: that every customer deserves access to premium products at fair prices,
-          backed by outstanding customer support. Today, we continue to uphold these values while embracing new technologies
-          and expanding our product offerings to meet the evolving needs of our community.
-        </p>
-        <p class="story-text">
-          We're not just selling products; we're building relationships, fostering trust, and creating experiences that
-          make a difference in our customers' lives. Every decision we make is guided by our commitment to excellence
-          and our passion for customer satisfaction.
-        </p>
+        <h2 class="section-title">{{ __('common.pages.our_story') }}</h2>
+        @if(isset($settings['content.about']) && $settings['content.about'])
+          <div class="story-text">
+            {!! $settings['content.about'] !!}
+          </div>
+        @else
+          <p class="story-text">
+            {{ __('common.messages.founded_with_vision') }}
+            What started as a small local business has grown into a trusted destination for quality products and exceptional service.
+          </p>
+          <p class="story-text">
+            Our journey began with a simple belief: that every customer deserves access to premium products at fair prices,
+            backed by outstanding customer support. Today, we continue to uphold these values while embracing new technologies
+            and expanding our product offerings to meet the evolving needs of our community.
+          </p>
+          <p class="story-text">
+            We're not just selling products; we're building relationships, fostering trust, and creating experiences that
+            make a difference in our customers' lives. Every decision we make is guided by our commitment to excellence
+            and our passion for customer satisfaction.
+          </p>
+        @endif
       </div>
     </div>
   </div>
@@ -454,18 +318,47 @@
   <div class="container position-relative">
     <h2 class="cta-title">Ready to Experience the Difference?</h2>
     <p class="cta-text">
-      Join thousands of satisfied customers who have chosen {{ $siteName ?? 'MyStore' }} for their shopping needs.
+      {{ __('common.messages.join_thousands_satisfied') }}
     </p>
     <div class="d-flex gap-3 justify-content-center flex-wrap">
-      <a href="{{ route('products.index') }}" class="btn btn-vel-gold btn-lg px-5 py-3">
+      <a href="{{ route('products.index') }}" class="btn btn-enhanced btn-lg px-5 py-3">
         Shop Now
         <i class="ms-2">→</i>
       </a>
       <a href="{{ route('contact') }}" class="btn btn-vel-outline btn-lg px-5 py-3">
-        Contact Us
+        {{ __('common.actions.contact_us') }}
       </a>
     </div>
   </div>
 </section>
 
 @endsection
+
+@push('scripts')
+<script>
+  // Enhanced reveal animations
+  (function(){
+    if (window.__velRevealBound) return;
+    window.__velRevealBound = true;
+
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe all reveal elements
+    document.querySelectorAll('.reveal').forEach(el => {
+      observer.observe(el);
+    });
+  })();
+</script>
+@endpush

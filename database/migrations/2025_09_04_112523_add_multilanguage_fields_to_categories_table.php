@@ -12,7 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            //
+            // Add multilanguage fields
+            $table->string('name_en')->nullable()->after('name');
+            $table->string('name_ar')->nullable()->after('name_en');
+            $table->string('slug_en')->nullable()->after('slug');
+            $table->string('slug_ar')->nullable()->after('slug_en');
+            $table->text('description_en')->nullable()->after('description');
+            $table->text('description_ar')->nullable()->after('description_en');
         });
     }
 
@@ -22,7 +28,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            //
+            // Remove multilanguage fields
+            $table->dropColumn([
+                'name_en', 'name_ar',
+                'slug_en', 'slug_ar',
+                'description_en', 'description_ar',
+            ]);
         });
     }
 };

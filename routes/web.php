@@ -10,6 +10,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [CatalogController::class, 'show'])->name('products.show');
+Route::get('/wishlist', [CatalogController::class, 'wishlist'])->name('wishlist.index');
 
 Route::get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
 Route::get('/category/{slug}', [CatalogController::class, 'category'])->name('categories.show');
@@ -46,30 +47,9 @@ Route::prefix('api/home')->group(function () {
     Route::post('/visibility/toggle/{section}', [HomeVisibilityController::class, 'toggleVisibility'])->name('api.home.visibility.toggle');
 });
 
-Route::get('/locale/{locale}', function (string $locale) {
-    if (! in_array($locale, ['ar', 'en'])) {
-        abort(404);
-    }
-    session(['locale' => $locale]);
-    // رجّع المستخدم لنفس الصفحة السابقة
-    return back();
-})->name('locale.switch');
+use Illuminate\Support\Facades\Redis;
 
-// Test route for translations
-Route::get('/test-translations', function () {
-    return [
-        'en' => [
-            'brand_titles_create' => __('brand.titles.create'),
-            'brand_actions_save' => __('brand.actions.save'),
-            'brand_fields_name' => __('brand.fields.name'),
-        ],
-        'ar' => [
-            'brand_titles_create' => __('brand.titles.create'),
-            'brand_actions_save' => __('brand.actions.save'),
-            'brand_fields_name' => __('brand.fields.name'),
-        ],
-        'current_locale' => app()->getLocale(),
-        'session_locale' => session('locale'),
-        'fallback_locale' => config('app.fallback_locale'),
-    ];
-})->name('test.translations');
+Route::get('/redis-test', function () {
+    Redis::set('framework', 'Laravel with Predis');
+    return Redis::get('framework');
+});

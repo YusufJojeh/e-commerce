@@ -13,14 +13,15 @@ class Setting extends Model
     protected $fillable = ['group','key','value'];
 
     // helper get('key', default) إن لم تكن موجودة
-    public static function get($key, $default = null)
+    public static function get($key, $default = null, $locale = null)
     {
         $row = static::where('key', $key)->first();
+        
         return $row ? $row->value : $default;
     }
 
     // helper set('key', value) لحفظ أو تحديث القيمة
-    public static function set($key, $value)
+    public static function set($key, $value, $locale = null)
     {
         $row = static::where('key', $key)->first();
 
@@ -36,4 +37,5 @@ class Setting extends Model
 
         return $value;
     }
+
 }

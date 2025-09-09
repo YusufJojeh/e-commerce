@@ -3,72 +3,12 @@
 @section('title', 'FAQ - ' . ($siteName ?? 'MyStore'))
 
 @push('styles')
+@include('partials.unified-styles')
 <style>
-  .faq-header {
-    background: linear-gradient(135deg, rgba(240,194,75,0.1) 0%, rgba(120,119,198,0.1) 100%);
-    border-radius: 24px;
-    padding: 4rem 2rem;
-    margin-bottom: 3rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .faq-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
-  }
-
-  .faq-title {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--text) 0%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 1rem;
-  }
-
-  .faq-subtitle {
-    color: var(--muted);
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin: 0 auto;
-  }
+  /* FAQ Page Specific Styles */
 
   .faq-section {
     margin-bottom: 3rem;
-  }
-
-  .section-title {
-    font-family: 'Georgia', serif;
-    font-weight: 700;
-    font-size: 2.5rem;
-    background: linear-gradient(135deg, var(--text) 0%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    position: relative;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    border-radius: 2px;
   }
 
   .faq-item {
@@ -161,17 +101,6 @@
     margin-bottom: 0.5rem;
   }
 
-  .contact-section {
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 3rem 2rem;
-    text-align: center;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  }
-
   .contact-title {
     font-size: 2rem;
     font-weight: 600;
@@ -187,65 +116,30 @@
     margin-left: auto;
     margin-right: auto;
   }
-
-  /* Dark mode enhancements */
-  html[data-theme="dark"] .faq-header {
-    background: linear-gradient(135deg, rgba(240,194,75,0.15) 0%, rgba(120,119,198,0.15) 100%);
-  }
-
-  html[data-theme="dark"] .faq-item {
-    background: rgba(26,26,26,0.8);
-    border-color: rgba(255,255,255,0.1);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-  }
-
-  html[data-theme="dark"] .faq-item:hover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-
-  html[data-theme="dark"] .faq-question {
-    background: rgba(26,26,26,0.9);
-    color: #f0f0f0;
-  }
-
-  html[data-theme="dark"] .faq-question:hover {
-    background: rgba(26,26,26,0.8);
-  }
-
-  html[data-theme="dark"] .faq-answer {
-    background: rgba(26,26,26,0.8);
-  }
-
-  html[data-theme="dark"] .contact-section {
-    background: rgba(26,26,26,0.8);
-    border-color: rgba(255,255,255,0.1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  }
 </style>
 @endpush
 
 @section('content')
 
 {{-- FAQ Header --}}
-<section class="faq-header reveal">
-  <div class="container position-relative">
-    <h1 class="faq-title">Frequently Asked Questions</h1>
-    <p class="faq-subtitle">
+<div class="container py-4">
+  <div class="page-header text-center mb-5">
+    <h1 class="page-title">{{ __('common.messages.frequently_asked_questions') }}</h1>
+    <p class="page-subtitle text-muted">
       Find answers to common questions about our products, services, and policies.
     </p>
   </div>
-</section>
 
 {{-- FAQ Content --}}
 <section class="py-5 reveal">
   <div class="container">
     {{-- General Questions --}}
     <div class="faq-section">
-      <h2 class="section-title">General Questions</h2>
+      <h2 class="section-title">{{ __('common.pages.general_questions') }}</h2>
 
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFAQ(this)">
-          What is {{ $siteName ?? 'MyStore' }}?
+          {{ __('common.messages.what_is_mystore') }}
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">
@@ -264,7 +158,7 @@
         </button>
         <div class="faq-answer">
           <p>
-            Creating an account is easy! Simply click on the "Sign Up" button in the top navigation,
+            {{ __('common.messages.creating_account_easy') }}
             fill in your details, and verify your email address. You'll then have access to your
             personalized dashboard, order history, and exclusive member benefits.
           </p>
@@ -403,7 +297,7 @@
 
     {{-- Product Information --}}
     <div class="faq-section">
-      <h2 class="section-title">Product Information</h2>
+      <h2 class="section-title">{{ __('common.pages.product_information') }}</h2>
 
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFAQ(this)">
@@ -450,7 +344,7 @@
 
     {{-- Customer Service --}}
     <div class="faq-section">
-      <h2 class="section-title">Customer Service</h2>
+      <h2 class="section-title">{{ __('common.pages.customer_service') }}</h2>
 
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFAQ(this)">
@@ -495,22 +389,20 @@
 </section>
 
 {{-- Contact Section --}}
-<section class="py-5 reveal">
-  <div class="container">
-    <div class="contact-section">
-      <h3 class="contact-title">Still Have Questions?</h3>
-      <p class="contact-text">
-        Can't find the answer you're looking for? Our customer service team is here to help!
-      </p>
-      <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{{ route('contact') }}" class="btn btn-vel-gold btn-lg px-4 py-2">
-          Contact Us
-          <i class="ms-2">→</i>
-        </a>
-        <a href="{{ route('products.index') }}" class="btn btn-vel-outline btn-lg px-4 py-2">
-          Browse Products
-        </a>
-      </div>
+<section class="cta-section reveal">
+  <div class="container position-relative">
+    <h3 class="contact-title">Still Have Questions?</h3>
+    <p class="contact-text">
+      Can't find the answer you're looking for? Our customer service team is here to help!
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{{ route('contact') }}" class="btn btn-enhanced btn-lg px-4 py-2">
+        {{ __('common.actions.contact_us') }}
+        <i class="ms-2">→</i>
+      </a>
+      <a href="{{ route('products.index') }}" class="btn btn-vel-outline btn-lg px-4 py-2">
+        {{ __('common.actions.browse_products') }}
+      </a>
     </div>
   </div>
 </section>

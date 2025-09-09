@@ -257,38 +257,7 @@
       <div class="row g-4">
         @foreach($products as $product)
           <div class="col-6 col-md-3">
-            <div class="product-card h-100">
-              @if(!is_null($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $product->price)
-                <div class="sale-badge">
-                  {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                </div>
-              @endif
-
-              <div class="thumb">
-                <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" loading="lazy">
-              </div>
-
-              <div class="card-body d-flex flex-column">
-                <div class="fw-semibold text-truncate mb-1">{{ $product->name }}</div>
-
-                @if($product->category)
-                  <div class="small text-muted mb-1">{{ $product->category->name }}</div>
-                @endif
-
-                <div class="small mt-auto">
-                  @if(!is_null($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $product->price)
-                    <span class="text-decoration-line-through text-muted me-1">{{ number_format($product->price, 2) }}</span>
-                    <span class="fw-semibold text-success">{{ number_format($product->sale_price, 2) }}</span>
-                  @else
-                    <span class="fw-semibold">{{ number_format($product->price, 2) }}</span>
-                  @endif
-                </div>
-
-                <a href="{{ route('products.show', $product->slug) }}" class="btn btn-vel-gold btn-sm mt-2">
-                  View Details
-                </a>
-              </div>
-            </div>
+            @includeIf('partials.product-card', ['p'=>$product])
           </div>
         @endforeach
       </div>
@@ -296,7 +265,7 @@
       {{-- Pagination --}}
       @if($products->hasPages())
         <div class="d-flex justify-content-center mt-5">
-          {{ $products->links() }}
+          {!! $products->links() !!}
         </div>
       @endif
     @else

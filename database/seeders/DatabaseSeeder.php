@@ -16,13 +16,14 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
+            OrchidAdminSeeder::class, // Add this first to ensure admin accounts exist
+            RoleSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,
             ProductSeeder::class,
             OfferSeeder::class,
             SlideSeeder::class,
             SettingSeeder::class,
-
         ]);
     }
 }

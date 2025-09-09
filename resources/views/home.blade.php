@@ -1236,7 +1236,7 @@
                 @endif
                   @if(!empty($slide->cta_url))
                     <a href="{{ $slide->cta_url }}" class="btn btn-vel-gold">
-                      {{ $slide->cta_label ?? 'Learn More' }}
+                      {{ $slide->cta_label ?? __('common.actions.learn_more') }}
                       </a>
                     @endif
                 </div>
@@ -1246,11 +1246,11 @@
           </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
+              <span class="visually-hidden">{{ __('common.actions.previous') }}</span>
             </button>
         <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
+              <span class="visually-hidden">{{ __('common.actions.next') }}</span>
             </button>
       </div>
         </div>
@@ -1264,25 +1264,25 @@
       <div class="col-md-3 col-6">
         <div class="stat-item">
           <div class="stat-number">{{ $specialProducts->count() }}+</div>
-          <div class="stat-label">Featured Products</div>
+          <div class="stat-label">{{ __('common.nav.featured_products') }}</div>
         </div>
       </div>
       <div class="col-md-3 col-6">
         <div class="stat-item">
           <div class="stat-number">{{ $categories->count() }}+</div>
-          <div class="stat-label">Categories</div>
+          <div class="stat-label">{{ __('common.nav.categories') }}</div>
         </div>
       </div>
       <div class="col-md-3 col-6">
         <div class="stat-item">
           <div class="stat-number">{{ $offers->count() }}+</div>
-          <div class="stat-label">Active Offers</div>
+          <div class="stat-label">{{ __('common.pages.active_offers') }}</div>
         </div>
       </div>
       <div class="col-md-3 col-6">
         <div class="stat-item">
           <div class="stat-number">24/7</div>
-          <div class="stat-label">Support</div>
+          <div class="stat-label">{{ __('common.pages.support') }}</div>
         </div>
       </div>
     </div>
@@ -1293,69 +1293,11 @@
 @if(isset($visibility['special']) && $visibility['special'] && isset($specialProducts) && $specialProducts->count())
   <section class="py-5 reveal">
       <div class="container">
-        <h2 class="section-title">Featured Products</h2>
+        <h2 class="section-title">{{ __('common.nav.featured_products') }}</h2>
         <div class="row g-4">
           @foreach($specialProducts as $p)
             <div class="col-6 col-md-3">
-              <div class="product-card h-100">
-                @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
-                  <div class="sale-badge">
-                    {{ round((($p->price - $p->sale_price) / $p->price) * 100) }}% OFF
-                  </div>
-                @endif
-
-                <div class="thumb">
-                  <img src="{{ $p->primary_image_url }}" alt="{{ $p->name }}" loading="lazy">
-                </div>
-
-                <div class="card-body">
-                  <div class="product-name">{{ $p->name }}</div>
-
-                  @if($p->brand)
-                    <div class="brand-name">{{ $p->brand->name }}</div>
-                  @endif
-
-                  <!-- Product Rating -->
-                  <div class="product-rating">
-                    <div class="rating-stars">
-                      @for($i = 1; $i <= 5; $i++)
-                        <span class="star {{ $i <= 4 ? '' : 'empty' }}">★</span>
-                      @endfor
-                    </div>
-                    <span class="rating-text">(4.2)</span>
-                  </div>
-
-                  <!-- Product Tags -->
-                  <div class="product-tags">
-                    <span class="product-tag">Premium</span>
-                    <span class="product-tag">New</span>
-                  </div>
-
-                  <!-- Stock Status -->
-                  <div class="stock-status">
-                    <span class="stock-indicator"></span>
-                    <span class="stock-text">In Stock</span>
-                  </div>
-
-                  <div class="price-section">
-                    @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
-                      <div class="price">
-                        <span class="original-price">${{ number_format($p->price, 2) }}</span>
-                        <span class="sale-price">${{ number_format($p->sale_price, 2) }}</span>
-                      </div>
-                    @else
-                      <div class="price">
-                        <span class="sale-price">${{ number_format($p->price, 2) }}</span>
-                      </div>
-                    @endif
-                  </div>
-
-                  <!-- WYW Button - Why You Want -->
-                  <a href="{{ route('products.show', $p->slug) }}" class="wyw-button">
-                    Why You Want This
-                  </a>
-                </div>
-              </div>
+              @includeIf('partials.product-card', ['p'=>$p])
             </div>
           @endforeach
         </div>
@@ -1367,7 +1309,7 @@
 @if(isset($visibility['categories']) && $visibility['categories'] && isset($categories) && $categories->count())
   <section class="py-5 reveal">
       <div class="container">
-        <h2 class="section-title">Shop by Category</h2>
+        <h2 class="section-title">{{ __('common.pages.shop_by_category') }}</h2>
         <div class="row g-4">
           @foreach($categories as $cat)
             <div class="col-6 col-md-3">
@@ -1394,7 +1336,7 @@
 @if(isset($visibility['offers']) && $visibility['offers'] && isset($offers) && $offers->count())
   <section class="py-5 reveal">
       <div class="container">
-        <h2 class="section-title">Special Offers</h2>
+        <h2 class="section-title">{{ __('common.pages.special_offers') }}</h2>
         <div class="row g-4">
           @foreach($offers as $offer)
             <div class="col-12 col-md-4">
@@ -1411,7 +1353,7 @@
                   @endif
                   @if(!empty($offer->cta_url))
                     <a href="{{ $offer->cta_url }}" class="btn btn-vel-gold">
-                      Shop Now
+                      {{ __('common.actions.shop_now') }}
                     </a>
                   @endif
                 </div>
@@ -1427,69 +1369,11 @@
 @if(isset($visibility['latest']) && $visibility['latest'] && isset($latestProducts) && $latestProducts->count())
   <section class="py-5 reveal">
       <div class="container">
-        <h2 class="section-title">New Arrivals</h2>
+        <h2 class="section-title">{{ __('common.nav.new_arrivals') }}</h2>
         <div class="row g-4">
           @foreach($latestProducts as $p)
             <div class="col-6 col-md-3">
-              <div class="product-card h-100">
-                @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
-                  <div class="sale-badge">
-                    {{ round((($p->price - $p->sale_price) / $p->price) * 100) }}% OFF
-                  </div>
-                @endif
-
-                <div class="thumb">
-                  <img src="{{ $p->primary_image_url }}" alt="{{ $p->name }}" loading="lazy">
-                </div>
-
-                <div class="card-body">
-                  <div class="product-name">{{ $p->name }}</div>
-
-                  @if($p->brand)
-                    <div class="brand-name">{{ $p->brand->name }}</div>
-                  @endif
-
-                  <!-- Product Rating -->
-                  <div class="product-rating">
-                    <div class="rating-stars">
-                      @for($i = 1; $i <= 5; $i++)
-                        <span class="star {{ $i <= 4 ? '' : 'empty' }}">★</span>
-                      @endfor
-                    </div>
-                    <span class="rating-text">(4.5)</span>
-                  </div>
-
-                  <!-- Product Tags -->
-                  <div class="product-tags">
-                    <span class="product-tag">New</span>
-                    <span class="product-tag">Trending</span>
-                  </div>
-
-                  <!-- Stock Status -->
-                  <div class="stock-status">
-                    <span class="stock-indicator"></span>
-                    <span class="stock-text">In Stock</span>
-                  </div>
-
-                  <div class="price-section">
-                    @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
-                      <div class="price">
-                        <span class="original-price">${{ number_format($p->price, 2) }}</span>
-                        <span class="sale-price">${{ number_format($p->sale_price, 2) }}</span>
-                      </div>
-                    @else
-                      <div class="price">
-                        <span class="sale-price">${{ number_format($p->price, 2) }}</span>
-                      </div>
-                    @endif
-                  </div>
-
-                  <!-- WYW Button - Why You Want -->
-                  <a href="{{ route('products.show', $p->slug) }}" class="wyw-button">
-                    Why You Want This
-                  </a>
-                </div>
-              </div>
+              @includeIf('partials.product-card', ['p'=>$p])
             </div>
           @endforeach
         </div>
@@ -1501,67 +1385,11 @@
 @if(isset($visibility['external']) && $visibility['external'] && isset($externalBrandProducts) && $externalBrandProducts->count())
   <section class="py-5 reveal">
       <div class="container">
-        <h2 class="section-title">Premium Brands</h2>
+        <h2 class="section-title">{{ __('common.nav.premium_brands') }}</h2>
         <div class="row g-4">
           @foreach($externalBrandProducts as $p)
             <div class="col-6 col-md-3">
-              <div class="product-card h-100">
-                @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
-                  <div class="sale-badge">
-                    {{ round((($p->price - $p->sale_price) / $p->price) * 100) }}% OFF
-                  </div>
-                @endif
-                <div class="thumb">
-                  <img src="{{ $p->primary_image_url }}" alt="{{ $p->name }}" loading="lazy">
-                </div>
-                <div class="card-body">
-                  <div class="product-name">{{ $p->name }}</div>
-
-                  @if($p->brand)
-                    <div class="brand-name">{{ $p->brand->name }}</div>
-                  @endif
-
-                  <!-- Product Rating -->
-                  <div class="product-rating">
-                    <div class="rating-stars">
-                      @for($i = 1; $i <= 5; $i++)
-                        <span class="star {{ $i <= 4 ? '' : 'empty' }}">★</span>
-                      @endfor
-                    </div>
-                    <span class="rating-text">(4.8)</span>
-                  </div>
-
-                  <!-- Product Tags -->
-                  <div class="product-tags">
-                    <span class="product-tag">Premium</span>
-                    <span class="product-tag">Brand</span>
-                  </div>
-
-                  <!-- Stock Status -->
-                  <div class="stock-status">
-                    <span class="stock-indicator"></span>
-                    <span class="stock-text">In Stock</span>
-                  </div>
-
-                  <div class="price-section">
-                    @if(!is_null($p->sale_price) && $p->sale_price > 0 && $p->sale_price < $p->price)
-                      <div class="price">
-                        <span class="original-price">${{ number_format($p->price, 2) }}</span>
-                        <span class="sale-price">${{ number_format($p->sale_price, 2) }}</span>
-                      </div>
-                    @else
-                      <div class="price">
-                        <span class="sale-price">${{ number_format($p->price, 2) }}</span>
-                      </div>
-                    @endif
-                  </div>
-
-                  <!-- WYW Button - Why You Want -->
-                  <a href="{{ route('products.show', $p->slug) }}" class="wyw-button">
-                    Why You Want This
-                  </a>
-                </div>
-              </div>
+              @includeIf('partials.product-card', ['p'=>$p])
             </div>
           @endforeach
         </div>
@@ -1572,10 +1400,10 @@
 {{-- ====================== CTA SECTION ====================== --}}
 <section class="cta-section reveal">
   <div class="container position-relative">
-    <h2 class="section-title text-white">Ready to Shop?</h2>
-    <p class="lead text-white mb-4">Discover amazing products at unbeatable prices</p>
+    <h2 class="section-title text-white">{{ __('common.pages.ready_to_shop') }}</h2>
+    <p class="lead text-white mb-4">{{ __('common.pages.discover_amazing_products') }}</p>
     <a href="{{ route('products.index') }}" class="btn btn-vel-gold btn-lg px-5 py-3">
-      Browse All Products
+      {{ __('common.actions.browse_all_products') }}
       <i class="ms-2">→</i>
     </a>
 </div>

@@ -689,3 +689,61 @@ html[data-theme="dark"] {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--crystal-secondary), var(--crystal-primary));
 }
+
+/* ===== Remove Blur Effects from Select Elements ===== */
+
+/* Remove blur effects from all select elements in admin screens */
+select, select *, select option, select optgroup {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Ensure select elements are crisp and clear in admin */
+select {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Remove blur from select dropdowns in admin */
+select option {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Remove blur from all form elements in admin */
+input, textarea, select, button, form {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Remove blur from Orchid form elements */
+.form-control, .form-select, .form-input, .form-textarea {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Remove blur from Orchid select elements specifically */
+.form-select, .form-select option, .form-select optgroup {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Override any existing blur effects on form controls */
+.form-control, .form-select {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Ensure dropdown options are clear */
+select option, .form-select option {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--crystal-glass) !important;
+}

@@ -1,67 +1,187 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# E-commerce Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern e-commerce platform built with Laravel and Orchid Platform for the admin dashboard.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 🛍️ **Product Management**
+  - Categories and subcategories
+  - Brand management
+  - Product variations
+  - Image handling with optimization
+  - Offers and discounts
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- 📊 **Admin Dashboard (Orchid Platform)**
+  - User and role management
+  - Site settings control
+  - Appearance customization
+  - Slide management
+  - Performance monitoring
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 🎨 **Frontend Features**
+  - Responsive design
+  - Image optimization
+  - Advanced caching system
+  - Performance optimizations
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP ^8.2
+- Composer
+- Node.js & NPM
+- MySQL/MariaDB
+- Redis (optional, for enhanced caching)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Clone the repository:
+```bash
+git clone https://github.com/YusufJojeh/e-commerce.git
+cd e-commerce
+```
 
-## Laravel Sponsors
+2. Install PHP dependencies:
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. Install Node.js dependencies:
+```bash
+npm install
+```
 
-### Premium Partners
+4. Create environment file:
+```bash
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+5. Configure your .env file with database and application settings:
+```env
+APP_NAME="Your Store Name"
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+6. Generate application key:
+```bash
+php artisan key:generate
+```
+
+7. Run migrations and seeders:
+```bash
+php artisan migrate --seed
+```
+
+8. Create storage link:
+```bash
+php artisan storage:link
+```
+
+9. Build assets:
+```bash
+npm run build
+```
+
+## Admin Access
+
+After running the seeders, two admin accounts will be created:
+
+### Main Admin
+- Email: admin@example.com
+- Password: Admin@123456
+
+### Backup Admin
+- Email: backup@example.com
+- Password: Backup@123456
+
+**Important:** Change these passwords immediately after first login!
+
+## Development
+
+1. Start the development server:
+```bash
+php artisan serve
+```
+
+2. Watch for asset changes:
+```bash
+npm run dev
+```
+
+## Deployment
+
+1. Set production environment variables
+2. Install dependencies:
+```bash
+composer install --optimize-autoloader --no-dev
+npm install && npm run build
+```
+
+3. Run deployment script:
+```bash
+bash deploy.sh
+```
+
+## Performance Optimization
+
+The platform includes several performance optimization features:
+
+- Image optimization and caching
+- Response caching
+- Database query optimization
+- Asset minification and bundling
+
+## Security
+
+- CSRF protection
+- XSS prevention
+- SQL injection prevention
+- Role-based access control
+- Two admin accounts for backup access
+
+## Cache Management
+
+Clear various caches:
+```bash
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+php artisan route:clear
+```
+
+## Backup
+
+The system includes automated backup functionality for:
+- Database
+- Uploaded files
+- Configuration
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-## Code of Conduct
+## Support
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+For support, please raise an issue in the GitHub repository.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Images
+## Credits
 
-- Run once: `php artisan storage:link`
-- Ensure `APP_URL=http://127.0.0.1:8000` (or your domain)
-- On Apache, allow symlinks for `/public/storage`. If you see 403 for `/storage/...`, enable `Options +SymLinksIfOwnerMatch` in your vhost.
+Built with:
+- [Laravel](https://laravel.com)
+- [Orchid Platform](https://orchid.software)
+- [Intervention Image](https://image.intervention.io/)
+- Other packages listed in composer.json and package.json

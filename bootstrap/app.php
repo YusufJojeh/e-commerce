@@ -11,8 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Add response cache middleware for performance optimization
         $middleware->web(append: [
-            \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\ResponseCache::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

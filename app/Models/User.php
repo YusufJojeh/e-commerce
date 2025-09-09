@@ -18,6 +18,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
+        'permissions',
     ];
 
     /**
@@ -66,4 +68,50 @@ class User extends Authenticatable
         'updated_at',
         'created_at',
     ];
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin || $this->hasRole('admin');
+    }
+
+    /**
+     * Check if user has specific role
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->roles()->where('slug', $role)->exists();
+    }
+
+    /**
+     * Get all permissions for the user (combines role permissions and user permissions)
+     */
+    public function getAllPermissions(): array
+    {
+        $rolePermissions = [];
+        
+        // Get permissions from roles
+        foreach ($this->roles as $role) {
+            if (is_array($role->permissions)) {
+                $rolePermissions = array_merge($rolePermissions, $role->permissions);
+            }
+        }
+        
+        // Get user-specific permissions
+        $userPermissions = is_array($this->permissions) ? $this->permissions : [];
+        
+        // Merge and return unique permissions
+        return array_unique(array_merge($rolePermissions, $userPermissions));
+    }
+
+    /**
+     * Check if user has a specific permission
+     */
+    public function hasPermission(string $permission): bool
+    {
+        $allPermissions = $this->getAllPermissions();
+        return isset($allPermissions[$permission]) && $allPermissions[$permission] == 1;
+    }
 }

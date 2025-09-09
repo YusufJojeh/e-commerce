@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Storage;
 use Orchid\Screen\AsSource;
 use Orchid\Filters\Filterable;
 use App\Traits\HasImages;
-
 class Brand extends Model
 {
     use AsSource, Filterable, HasImages;
@@ -69,5 +68,13 @@ class Brand extends Model
     protected function getImageFallback(): ?string
     {
         return 'images/placeholder-brand.png';
+    }
+
+    /**
+     * Get the products for this brand
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

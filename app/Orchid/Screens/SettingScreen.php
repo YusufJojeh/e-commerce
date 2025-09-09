@@ -9,6 +9,8 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Group;
+use Orchid\Screen\Fields\TextArea;
+use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
 
@@ -29,6 +31,17 @@ class SettingScreen extends Screen
         $limitsJson = Setting::get('home.limits');
         $limits     = is_string($limitsJson) && $limitsJson ? json_decode($limitsJson, true) : [];
 
+        // Social Media Settings
+        $socialMediaJson = Setting::get('site.social_media');
+        $socialMedia = is_string($socialMediaJson) && $socialMediaJson ? json_decode($socialMediaJson, true) : [];
+
+        // Content Settings
+        $aboutContent = Setting::get('content.about', '');
+        $contactContent = Setting::get('content.contact', '');
+        $faqContent = Setting::get('content.faq', '');
+        $privacyContent = Setting::get('content.privacy', '');
+        $termsContent = Setting::get('content.terms', '');
+
         // Get current logo URLs for display
         $logoLightUrl = $logoLight ? $imageService->getUrl($logoLight) : null;
         $logoDarkUrl  = $logoDark ? $imageService->getUrl($logoDark) : null;
@@ -44,6 +57,17 @@ class SettingScreen extends Screen
                 'latest'     => $limits['latest']     ?? 12,
                 'external'   => $limits['external']   ?? 12,
                 'categories' => $limits['categories'] ?? 8,
+            ],
+            'social_media'  => [
+                'facebook'   => $socialMedia['facebook'] ?? '',
+                'instagram'  => $socialMedia['instagram'] ?? '',
+            ],
+            'content'       => [
+                'about'      => $aboutContent,
+                'contact'    => $contactContent,
+                'faq'        => $faqContent,
+                'privacy'    => $privacyContent,
+                'terms'      => $termsContent,
             ],
         ];
     }
@@ -99,6 +123,48 @@ class SettingScreen extends Screen
                     Input::make('limits.categories')->title('Home: Categories limit')->type('number'),
                 ])->autoWidth(),
             ])->title('Home Page Limits'),
+
+            // Social Media Section
+            Layout::rows([
+                Input::make('social_media.facebook')->title('Facebook URL')->placeholder('https://facebook.com/yourpage'),
+                Input::make('social_media.instagram')->title('Instagram URL')->placeholder('https://instagram.com/yourpage'),
+            ])->title('Social Media Links'),
+
+            // Content Management Section
+            Layout::rows([
+                TextArea::make('content.about')
+                    ->title('About Us Content')
+                    ->rows(8)
+                    ->placeholder('Enter the content for your About Us page...'),
+            ])->title('About Us Page'),
+
+            Layout::rows([
+                TextArea::make('content.contact')
+                    ->title('Contact Page Content')
+                    ->rows(6)
+                    ->placeholder('Enter additional contact information...'),
+            ])->title('Contact Page'),
+
+            Layout::rows([
+                TextArea::make('content.faq')
+                    ->title('FAQ Content')
+                    ->rows(10)
+                    ->placeholder('Enter FAQ content in HTML format...'),
+            ])->title('FAQ Page'),
+
+            Layout::rows([
+                TextArea::make('content.privacy')
+                    ->title('Privacy Policy Content')
+                    ->rows(12)
+                    ->placeholder('Enter your privacy policy content...'),
+            ])->title('Privacy Policy Page'),
+
+            Layout::rows([
+                TextArea::make('content.terms')
+                    ->title('Terms of Service Content')
+                    ->rows(12)
+                    ->placeholder('Enter your terms of service content...'),
+            ])->title('Terms of Service Page'),
         ];
     }
 
@@ -114,6 +180,13 @@ class SettingScreen extends Screen
             'limits.latest'     => ['nullable','integer','min:1'],
             'limits.external'   => ['nullable','integer','min:1'],
             'limits.categories' => ['nullable','integer','min:1'],
+            'social_media.facebook'  => ['nullable','url'],
+            'social_media.instagram' => ['nullable','url'],
+            'content.about'     => ['nullable','string'],
+            'content.contact'   => ['nullable','string'],
+            'content.faq'       => ['nullable','string'],
+            'content.privacy'   => ['nullable','string'],
+            'content.terms'     => ['nullable','string'],
         ]);
 
         // Save site name
@@ -163,6 +236,20 @@ class SettingScreen extends Screen
             'categories' => (int)($data['limits']['categories'] ?? 8),
         ];
         Setting::set('home.limits', json_encode($limits));
+
+        // Save social media links
+        $socialMedia = [
+            'facebook'   => $data['social_media']['facebook'] ?? '',
+            'instagram'  => $data['social_media']['instagram'] ?? '',
+        ];
+        Setting::set('site.social_media', json_encode($socialMedia));
+
+        // Save content
+        Setting::set('content.about', $data['content']['about'] ?? '');
+        Setting::set('content.contact', $data['content']['contact'] ?? '');
+        Setting::set('content.faq', $data['content']['faq'] ?? '');
+        Setting::set('content.privacy', $data['content']['privacy'] ?? '');
+        Setting::set('content.terms', $data['content']['terms'] ?? '');
 
         Toast::info('Settings saved successfully.');
         return back();

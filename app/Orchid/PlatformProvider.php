@@ -74,14 +74,7 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.site.home')
                 ->permission('manage.settings'),
 
-            // ✅ أزرار تبديل اللغة كعناصر Menu (بدون Link::make)
-            Menu::make(__('common.ui.lang_ar'))
-                ->icon('bs.translate')
-                ->route('locale.switch', ['locale' => 'ar']),
 
-            Menu::make(__('common.ui.lang_en'))
-                ->icon('bs.translate')
-                ->route('locale.switch', ['locale' => 'en']),
 
             // ====== الصلاحيات
             Menu::make(__('platform.menu.users'))

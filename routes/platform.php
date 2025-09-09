@@ -228,3 +228,18 @@ Route::screen('settings', SettingScreen::class)
         ->breadcrumbs(fn ($trail) => $trail
             ->parent('platform.index')
             ->push('Appearance', route('platform.appearance')));
+
+
+// Backup Management
+Route::screen('backups', \App\Orchid\Screens\BackupManagementScreen::class)
+    ->name('platform.backups')
+    ->breadcrumbs(fn ($trail) => $trail
+        ->parent('platform.index')
+        ->push('Backup Management', route('platform.backups')));
+
+// Content Versioning
+Route::screen('content-versioning', \App\Orchid\Screens\ContentVersioningScreen::class)
+    ->name('platform.content-versioning')
+    ->breadcrumbs(fn ($trail) => $trail
+        ->parent('platform.index')
+        ->push('Content Versioning', route('platform.content-versioning')));

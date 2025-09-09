@@ -1,14 +1,22 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="{{ app()->getLocale() }}" dir="{{ $htmlDir ?? 'ltr' }}" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@yield('title', $siteName ?? 'MyStore')</title>
+  <title>@yield('title', $siteName ?? 'AVENUE')</title>
 
   {{-- Bootstrap --}}
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  {{-- Brand Fonts --}}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+
+  {{-- Font Awesome --}}
+  <link rel="preload" as="image" href="{{ asset('brand/avenue.svg') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
 
   {{-- CSS Fallback System --}}
   <script>
@@ -83,32 +91,278 @@
       background: transparent;
     }
 
-    /* NAVBAR (glassy) */
+    /* ENHANCED NAVBAR (glassy) */
     .vel-nav{
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       background: var(--glass-strong) !important;
       border-bottom: 1px solid var(--ring);
-      box-shadow: var(--shadow);
-    }
-    .navbar-brand,.nav-link{ color:var(--text)!important; }
-                 .nav-link:hover{
-      color: #f0c24b !important;
-      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       transition: all 0.3s ease;
     }
-    .navbar .form-control{
-      background: var(--glass);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 999px;
+
+    /* Brand Styling */
+    .navbar-brand {
+      color: var(--text) !important;
+      font-size: 1.4rem;
+      transition: all 0.3s ease;
     }
-    .navbar .form-control::placeholder{ color:var(--muted); }
-    .navbar-toggler{ color:var(--text); border-color:var(--border); }
-    .navbar-toggler-icon{
+
+    .navbar-brand:hover {
+      color: var(--gold) !important;
+      transform: scale(1.05);
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--gold), #ffd700);
+      border-radius: 8px;
+      color: #111216 !important;
+    }
+
+    .brand-text {
+      font-weight: 700;
+      font-family: 'Cinzel', serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--text), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* AVENUE Inline Logo */
+    .logo-avenue{ height:32px; width:auto; display:block; }
+    .logo-avenue .mark-bg{ fill:url(#avenueGrad); }
+    .logo-avenue .mark-text{ font-family:'Cinzel', serif; font-weight:700; fill:#111216; }
+    .logo-avenue .word-text{ font-family:'Cinzel', serif; font-weight:700; letter-spacing:.12em; fill:url(#avenueGradText); }
+
+    /* Navigation Links */
+    .nav-link {
+      color: var(--text) !important;
+      font-weight: 500;
+      padding: 0.75rem 1rem !important;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--gold) !important;
+      background: rgba(240, 194, 75, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .nav-link i {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .nav-link:hover i {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* Theme Switcher */
+    .btn-theme-switcher {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .btn-theme-switcher:hover {
+      background: var(--gold);
+      color: #111216;
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(240, 194, 75, 0.3);
+    }
+
+    .btn-theme-switcher i {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-theme-switcher:hover i {
+      transform: rotate(180deg);
+    }
+
+    /* Language Switcher */
+    .btn-language-switcher {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .btn-language-switcher:hover {
+      background: var(--gold);
+      color: #111216;
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(240, 194, 75, 0.3);
+    }
+
+    .btn-language-switcher i {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-language-switcher:hover i {
+      transform: scale(1.1);
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(240, 194, 75, 0.1);
+      color: var(--gold);
+      transform: translateX(4px);
+    }
+
+    .dropdown-item i {
+      width: 16px;
+      text-align: center;
+    }
+
+    /* Mobile Toggle */
+    .navbar-toggler {
+      color: var(--text);
+      border-color: var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(240, 194, 75, 0.25);
+    }
+
+    .navbar-toggler-icon {
       background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(17,18,22,.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
-    html[data-theme="dark"] .navbar-toggler-icon{
+
+    /* RTL Support */
+    [dir="rtl"] .navbar-brand {
+      text-align: right;
+    }
+
+    [dir="rtl"] .nav-link {
+      text-align: right;
+    }
+
+    [dir="rtl"] .dropdown-menu {
+      text-align: right;
+    }
+
+    [dir="rtl"] .dropdown-item:hover {
+      transform: translateX(-4px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+      .navbar-nav {
+        text-align: center;
+        margin-top: 1rem;
+      }
+
+      .nav-link {
+        padding: 0.75rem 1rem !important;
+        margin: 0.25rem 0;
+      }
+
+      .d-flex.align-items-center.gap-2 {
+        justify-content: center;
+        margin-top: 1rem;
+      }
+    }
+
+    /* Dark Mode Enhancements */
+    html[data-theme="dark"] .vel-nav {
+      background: rgba(17, 18, 22, 0.95) !important;
+      border-bottom-color: rgba(255,255,255,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    html[data-theme="dark"] .navbar-brand {
+      color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .brand-text {
+      background: linear-gradient(135deg, #ffffff, var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    html[data-theme="dark"] .nav-link {
+      color: rgba(255,255,255,0.8) !important;
+    }
+
+    html[data-theme="dark"] .nav-link:hover {
+      color: var(--gold) !important;
+      background: rgba(240, 194, 75, 0.15);
+    }
+
+    html[data-theme="dark"] .btn-theme-switcher,
+    html[data-theme="dark"] .btn-language-switcher {
+      background: rgba(26,26,26,0.8);
+      border-color: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.8);
+    }
+
+    html[data-theme="dark"] .btn-theme-switcher:hover,
+    html[data-theme="dark"] .btn-language-switcher:hover {
+      background: var(--gold);
+      color: #111216;
+      border-color: var(--gold);
+    }
+
+    html[data-theme="dark"] .dropdown-menu {
+      background: rgba(26,26,26,0.95);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    html[data-theme="dark"] .dropdown-item {
+      color: rgba(255,255,255,0.8);
+    }
+
+    html[data-theme="dark"] .dropdown-item:hover {
+      background: rgba(240, 194, 75, 0.15);
+      color: var(--gold);
+    }
+
+    html[data-theme="dark"] .navbar-toggler {
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    html[data-theme="dark"] .navbar-toggler-icon {
       background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(236,238,242,.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
 
@@ -1574,6 +1828,45 @@
       color: #111216;
     }
 
+    /* Remove blur effects from all select elements */
+    select, select *, select option, select optgroup {
+      filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Ensure select elements are crisp and clear */
+    select {
+      filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Remove blur from select dropdowns */
+    select option {
+      filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Remove blur from all form elements */
+    input, textarea, select, button, form {
+      filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Remove blur from form elements in dark mode */
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] textarea,
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] button,
+    html[data-theme="dark"] form {
+      filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
     /* Dark Mode Scrollbar */
     html[data-theme="dark"] ::-webkit-scrollbar {
       width: 12px;
@@ -1591,10 +1884,393 @@
     html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
       background: rgba(255,255,255,0.3);
     }
+
+    /* ===== Enhanced Product Card Styles ===== */
+
+    /* Product Actions Container */
+    .product-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(240,194,75,0.2);
+    }
+
+    /* Product Action Buttons */
+    .product-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      border: 1px solid;
+      background: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-action-btn .btn-icon {
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .product-action-btn .btn-text {
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    /* View Details Button */
+    .view-details-btn {
+      color: #3b82f6;
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .view-details-btn:hover {
+      color: #ffffff;
+      background: #3b82f6;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Copy Link Button */
+    .copy-link-btn {
+      color: #6b7280;
+      border-color: #6b7280;
+      background: rgba(107, 114, 128, 0.1);
+    }
+
+    .copy-link-btn:hover {
+      color: #ffffff;
+      background: #6b7280;
+      border-color: #6b7280;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+
+    /* Wishlist Button */
+    .wishlist-btn {
+      color: #ef4444;
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .wishlist-btn:hover {
+      color: #ffffff;
+      background: #ef4444;
+      border-color: #ef4444;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .wishlist-btn.in-wishlist {
+      color: #ffffff;
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .wishlist-btn.in-wishlist .wishlist-icon {
+      animation: heartBeat 0.6s ease-in-out;
+    }
+
+    @keyframes heartBeat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Product Action Button Hover Effects */
+    .product-action-btn:hover .btn-icon {
+      transform: scale(1.1);
+    }
+
+    /* ===== Product Modal Styles ===== */
+
+    .product-modal-image {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+    }
+
+    .product-modal-image img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .product-modal-image:hover img {
+      transform: scale(1.05);
+    }
+
+    .product-modal-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .product-modal-brand {
+      font-size: 1rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .product-modal-price {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .product-modal-price .original-price {
+      font-size: 1.25rem;
+      color: var(--muted);
+      text-decoration: line-through;
+      margin-right: 0.75rem;
+    }
+
+    .product-modal-price .sale-price {
+      color: #10b981;
+      text-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .product-modal-description {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .product-modal-actions .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .product-modal-actions .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Modal Dark Mode Styles */
+    html[data-theme="dark"] .modal-content {
+      background: rgba(22, 26, 32, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .modal-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-theme="dark"] .modal-title {
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .btn-close {
+      filter: invert(1);
+    }
+
+    html[data-theme="dark"] .product-modal-image {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-theme="dark"] .product-modal-name {
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .product-modal-brand {
+      color: var(--gold);
+    }
+
+    html[data-theme="dark"] .product-modal-price {
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .product-modal-description {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* ===== Toast Notification Styles ===== */
+
+    .toast {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .toast-header {
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toast-body {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .toast-success {
+      border-left: 4px solid #10b981;
+    }
+
+    .toast-success .toast-header {
+      color: #10b981;
+    }
+
+    .toast-error {
+      border-left: 4px solid #ef4444;
+    }
+
+    .toast-error .toast-header {
+      color: #ef4444;
+    }
+
+    .toast-info {
+      border-left: 4px solid #3b82f6;
+    }
+
+    .toast-info .toast-header {
+      color: #3b82f6;
+    }
+
+    /* Dark Mode Toast Styles */
+    html[data-theme="dark"] .toast {
+      background: rgba(22, 26, 32, 0.98);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-theme="dark"] .toast-header {
+      border-bottom-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .toast-body {
+      color: #ffffff;
+    }
+
+    /* ===== Responsive Design ===== */
+
+    @media (max-width: 768px) {
+      .product-actions {
+        gap: 0.375rem;
+      }
+
+      .product-action-btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      .product-action-btn .btn-text {
+        font-size: 0.75rem;
+      }
+
+      .product-modal-image img {
+        height: 250px;
+      }
+
+      .product-modal-name {
+        font-size: 1.25rem;
+      }
+
+      .product-modal-price {
+        font-size: 1.5rem;
+      }
+
+      .product-modal-actions .btn {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .product-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .product-action-btn {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      .product-action-btn .btn-text {
+        display: none;
+      }
+
+      .product-action-btn .btn-icon {
+        font-size: 1.25rem;
+      }
+
+      .product-modal-image img {
+        height: 200px;
+      }
+
+      .product-modal-name {
+        font-size: 1.125rem;
+      }
+
+      .product-modal-price {
+        font-size: 1.25rem;
+      }
+    }
+
+    /* ===== Animation Enhancements ===== */
+
+    .product-action-btn {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .product-action-btn:nth-child(1) { animation-delay: 0.1s; }
+    .product-action-btn:nth-child(2) { animation-delay: 0.2s; }
+    .product-action-btn:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Loading State for Buttons */
+    .product-action-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .product-action-btn.loading .btn-icon {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 
   @php
-    $siteName = $siteName ?? (\App\Models\Setting::get('site.name','MyStore') ?? 'MyStore');
+    $siteName = $siteName ?? (\App\Models\Setting::get('site.name','AVENUE') ?? 'AVENUE');
     $logoPath = \App\Models\Setting::get('site.logo_light');
     $favicon  = \App\Models\Setting::get('site.favicon');
   @endphp
@@ -1612,39 +2288,71 @@
   $waText   = urlencode('Hello! I need assistance.');
 @endphp
 
-{{-- NAVBAR --}}
+{{-- ENHANCED NAVBAR --}}
 <nav class="navbar navbar-expand-lg vel-nav sticky-top">
-  <div class="container py-1">
-    <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="/">
-      @if($logoPath)
-        <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ $siteName }}" style="height:28px; width:auto;">
+  <div class="container py-2">
+    {{-- Logo Section - Left for EN, Right for AR --}}
+    <a class="navbar-brand fw-bold d-flex align-items-center {{ app()->getLocale() === 'ar' ? 'order-lg-3' : 'order-lg-1' }}" href="/" style="gap:.5rem;">
+      @if($logoPath && file_exists(storage_path('app/public/' . $logoPath)))
+        <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ $siteName }}" style="height:36px; width:auto;">
+      @else
+        <picture>
+          <source srcset="{{ asset('brand/avenue-dark.svg') }}" media="(prefers-color-scheme: dark)">
+          <img src="{{ asset('brand/avenue.svg') }}" alt="{{ $siteName }}" style="height:36px; width:auto;" loading="eager" fetchpriority="high">
+        </picture>
       @endif
-      <span>{{ $siteName }}</span>
     </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+    {{-- Mobile Toggle --}}
+    <button class="navbar-toggler {{ app()->getLocale() === 'ar' ? 'order-lg-1' : 'order-lg-3' }}" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
             aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="mainNav" class="collapse navbar-collapse">
-      {{-- Links --}}
-      <ul class="navbar-nav me-3 mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('categories.index') }}">Categories</a></li>
+    <div id="mainNav" class="collapse navbar-collapse order-lg-2">
+      {{-- Center Navigation Links --}}
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('products.index') }}">
+            Products
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('categories.index') }}">
+            Categories
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('brands.index') }}">
+            {{ __('common.nav.brands') }}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('about') }}">
+            {{ __('common.nav.about') }}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('contact') }}">
+            {{ __('common.nav.contact') }}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('wishlist.index') }}">
+            {{ __('common.nav.wishlist') }}
+          </a>
+        </li>
       </ul>
 
-      {{-- Search --}}
-      <form class="d-flex align-items-center flex-grow-1 me-3" role="search" action="{{ route('products.index') }}" method="get">
-        <input class="form-control form-control-sm px-3 me-2" type="search" name="q" placeholder="Search products…" aria-label="Search" value="{{ request('q') }}">
-        <button class="btn btn-sm btn-vel-gold" type="submit">Search</button>
-      </form>
+      {{-- Right Actions - Theme & Language Switchers --}}
+      <div class="d-flex align-items-center gap-2 {{ app()->getLocale() === 'ar' ? 'order-lg-1' : 'order-lg-3' }}">
+        {{-- Theme Switcher --}}
+        <div class="theme-switcher">
+          <button class="btn btn-sm btn-theme-switcher" type="button" id="velToggleNav" title="{{ __('common.messages.toggle_theme') }}">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
 
-      {{-- Actions --}}
-      <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-sm btn-vel-outline" type="button" id="velToggleNav">
-          <span id="velIconNav">🌙</span> Theme
-        </button>
       </div>
     </div>
   </div>
@@ -1660,38 +2368,37 @@
       <div class="col-12 col-md-4">
         <div class="footer-head">{{ $siteName }}</div>
         <p class="footer-description mb-3">
-          A refined storefront experience with performance, accessibility, and design excellence.
+          {{ __('common.pages.refined_storefront') }}
           Discover premium products curated for discerning customers.
         </p>
         <div class="footer-social">
           <div class="social-links">
-            <a href="#" class="social-link facebook-link" aria-label="Facebook">
+            @if(isset($settings['social_media']['facebook']) && $settings['social_media']['facebook'])
+            <a href="{{ $settings['social_media']['facebook'] }}" target="_blank" class="social-link facebook-link" aria-label="Facebook">
               <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a href="#" class="social-link instagram-link" aria-label="Instagram">
+            @endif
+
+            @if(isset($settings['social_media']['instagram']) && $settings['social_media']['instagram'])
+            <a href="{{ $settings['social_media']['instagram'] }}" target="_blank" class="social-link instagram-link" aria-label="Instagram">
               <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M16.98 0a6.9 6.9 0 0 1 5.08 1.98A6.94 6.94 0 0 1 24 7.02v9.96c0 2.08-.68 3.87-1.98 5.13A7.14 7.14 0 0 1 16.94 24H7.06a7.06 7.06 0 0 1-5.03-1.89A6.96 6.96 0 0 1 0 16.94V7.02C0 2.8 2.8 0 7.02 0h9.96zm.05 2.23H7.06c-1.45 0-2.7.43-3.53 1.25a4.82 4.82 0 0 0-1.02 1.08A4.9 4.9 0 0 0 2.1 7.02v9.92a4.9 4.9 0 0 0 1.44 3.53 4.9 4.9 0 0 0 3.53 1.44h9.88a4.9 4.9 0 0 0 3.53-1.44 4.9 4.9 0 0 0 1.44-3.53V7.02a4.9 4.9 0 0 0-1.44-3.53 4.9 4.9 0 0 0-3.53-1.44zM12 5.76c3.39 0 6.13 2.74 6.13 6.13a6.13 6.13 0 0 1-12.26 0c0-3.39 2.74-6.13 6.13-6.13zm0 2.22a3.91 3.91 0 0 0-3.9 3.9 3.91 3.91 0 0 0 3.9 3.9 3.91 3.91 0 0 0 3.9-3.9 3.91 3.91 0 0 0-3.9-3.9zm6.44-3.53a1.68 1.68 0 0 1 0 3.36 1.68 1.68 0 0 1-3.36 0 1.68 1.68 0 0 1 3.36 0z"/>
               </svg>
             </a>
-            <a href="#" class="social-link linkedin-link" aria-label="LinkedIn">
-              <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-            </a>
+            @endif
           </div>
         </div>
       </div>
 
       <div class="col-6 col-md-2">
-        <div class="footer-head">Browse</div>
+        <div class="footer-head">Products</div>
         <ul class="footer-links">
           <li><a class="footer-link" href="{{ route('products.index') }}">All Products</a></li>
           <li><a class="footer-link" href="{{ route('categories.index') }}">Categories</a></li>
           <li><a class="footer-link" href="{{ route('brands.index') }}">Brands</a></li>
-          <li><a class="footer-link" href="#">New Arrivals</a></li>
-          <li><a class="footer-link" href="#">Best Sellers</a></li>
+          <li><a class="footer-link" href="{{ route('wishlist.index') }}">Wishlist</a></li>
         </ul>
       </div>
 
@@ -1701,36 +2408,43 @@
           <li><a class="footer-link" href="{{ route('about') }}">About Us</a></li>
           <li><a class="footer-link" href="{{ route('contact') }}">Contact</a></li>
           <li><a class="footer-link" href="{{ route('faq') }}">FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <div class="footer-head">Legal</div>
+        <ul class="footer-links">
           <li><a class="footer-link" href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
           <li><a class="footer-link" href="{{ route('terms-of-service') }}">Terms of Service</a></li>
         </ul>
       </div>
 
+      <div class="col-6 col-md-2">
+        <div class="footer-head">Sitemap</div>
+        <ul class="footer-links">
+          <li><a class="footer-link" href="/">Home</a></li>
+          <li><a class="footer-link" href="{{ route('products.index') }}">Products</a></li>
+          <li><a class="footer-link" href="{{ route('categories.index') }}">Categories</a></li>
+          <li><a class="footer-link" href="{{ route('brands.index') }}">Brands</a></li>
+          <li><a class="footer-link" href="{{ route('about') }}">About</a></li>
+          <li><a class="footer-link" href="{{ route('contact') }}">Contact</a></li>
+        </ul>
+      </div>
+
       <div class="col-12 col-md-4">
-        <div class="footer-head">Stay in the loop</div>
-        <p class="footer-description">Subscribe to updates and exclusive product drops.</p>
-        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thanks! (wire this to your backend)');">
+        <div class="footer-head">Newsletter</div>
+        <p class="footer-description">Stay updated with our latest products and offers.</p>
+        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
           <div class="input-group">
-            <input type="email" class="form-control form-control-sm px-3" placeholder="Your email address" required>
+            <input type="email" class="form-control form-control-sm px-3" placeholder="Enter your email" required>
             <button class="btn btn-sm btn-vel-gold px-3" type="submit">Subscribe</button>
           </div>
         </form>
-                 <div class="newsletter-benefits mt-2">
-           <small class="text-muted">
-             <svg class="inline-icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-             </svg>
-             Early access to sales •
-             <svg class="inline-icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-             </svg>
-             Exclusive offers •
-             <svg class="inline-icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-             </svg>
-             Product updates
-           </small>
-         </div>
+        <div class="newsletter-benefits mt-2">
+          <small class="text-muted">
+            • Early access to sales • Exclusive offers • Product updates
+          </small>
+        </div>
       </div>
     </div>
 
@@ -1755,8 +2469,80 @@
   </div>
 </footer>
 
+{{-- Product Details Modal --}}
+<div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productDetailsModalLabel">{{ __('common.fields.product_details') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('common.actions.close') }}"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-4">
+          <!-- Product Image -->
+          <div class="col-md-6">
+            <div class="product-modal-image">
+              <img id="modalProductImage" src="" alt="" class="img-fluid rounded">
+            </div>
+          </div>
+
+          <!-- Product Details -->
+          <div class="col-md-6">
+            <div class="product-modal-details">
+              <h4 id="modalProductName" class="product-modal-name"></h4>
+              <p id="modalProductBrand" class="product-modal-brand"></p>
+
+              <div class="product-modal-price-section">
+                <div id="modalProductPrice" class="product-modal-price"></div>
+              </div>
+
+              <div id="modalProductDescription" class="product-modal-description"></div>
+
+              <div class="product-modal-actions mt-4">
+                <a id="modalProductLink" href="#" class="btn btn-primary btn-lg w-100 mb-3" target="_blank">
+                  <i class="fas fa-external-link-alt me-2"></i>
+                  {{ __('common.actions.view') }} {{ __('common.nav.products') }}
+                </a>
+
+                <div class="row g-2">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-outline-secondary w-100" id="modalCopyLinkBtn">
+                      <i class="fas fa-copy me-2"></i>
+                      {{ __('common.actions.copy') }}
+                    </button>
+                  </div>
+                  <div class="col-6">
+                    <button type="button" class="btn btn-outline-danger w-100" id="modalWishlistBtn">
+                      <i class="fas fa-heart me-2"></i>
+                      {{ __('common.nav.wishlist') }}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="row g-2 mt-2">
+                  <div class="col-12">
+                    <a id="modalWhatsAppBtn" href="#" class="btn btn-success w-100" target="_blank">
+                      <i class="fab fa-whatsapp me-2"></i>
+                      WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- Toast Container for Notifications --}}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer">
+  <!-- Toast notifications will be dynamically inserted here -->
+</div>
+
 {{-- Floating WhatsApp FAB --}}
-<a class="wa-fab" href="https://wa.me/{{ $waNumber }}?text={{ $waText }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+<a class="wa-fab" href="https://wa.me/{{ $waNumber }}?text={{ $waText }}" target="_blank" rel="noopener" aria-label="{{ __('common.messages.chat_on_whatsapp') }}">
   <span class="wa-icon" aria-hidden="true"></span> WhatsApp
 </a>
 
@@ -1853,7 +2639,99 @@
 
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 })();
+
+// Enhanced Navigation Features
+document.addEventListener('DOMContentLoaded', function() {
+  // Update theme icon based on current theme
+  function updateThemeIcon() {
+    const themeIcon = document.getElementById('themeIcon');
+    if (themeIcon) {
+      const currentTheme = root.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+        themeIcon.title = '{{ __("common.messages.switch_to_light_mode") }}';
+      } else {
+        themeIcon.className = 'fas fa-moon';
+        themeIcon.title = '{{ __("common.messages.switch_to_dark_mode") }}';
+      }
+    }
+  }
+
+  // Initialize theme icon
+  updateThemeIcon();
+
+  // Update icon when theme changes
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        updateThemeIcon();
+      }
+    });
+  });
+  observer.observe(root, { attributes: true });
+
+  // Language switcher enhancement
+  const languageDropdown = document.getElementById('languageDropdown');
+  if (languageDropdown) {
+    // Add click animation
+    languageDropdown.addEventListener('click', function() {
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 150);
+    });
+  }
+
+  // Add smooth scroll for navigation links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Add navbar scroll effect
+  const navbar = document.querySelector('.vel-nav');
+  if (navbar) {
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (scrollTop > 100) {
+        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+        navbar.style.backdropFilter = 'blur(20px)';
+        navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+      } else {
+        navbar.style.background = '';
+        navbar.style.backdropFilter = '';
+        navbar.style.boxShadow = '';
+      }
+
+      lastScrollTop = scrollTop;
+    });
+  }
+
+  // Add hover effects for navigation links
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+    });
+
+    link.addEventListener('mouseleave', function() {
+      this.style.transform = '';
+    });
+  });
+});
 </script>
+
+{{-- Enhanced Product Cards JavaScript --}}
+<script src="{{ asset('js/enhanced-product-cards.js') }}"></script>
 
 @stack('scripts')
 </body>

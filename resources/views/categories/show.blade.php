@@ -170,7 +170,7 @@
   {{-- Pagination --}}
   @if($products->hasPages())
     <div class="mt-4">
-      {{ $products->appends(request()->query())->links() }}
+      {!! $products->appends(request()->query())->links() !!}
     </div>
   @endif
 

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 use Orchid\Screen\AsSource;
 use Orchid\Filters\Filterable;
 use App\Services\ImageService;
-
 class Product extends Model
 {
     use AsSource, Filterable;
