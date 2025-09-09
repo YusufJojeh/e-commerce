@@ -2,8 +2,9 @@ services:
   - type: web
     name: avenuebrand
     env: php
+    plan: free
     buildCommand: "./render-build.sh"
-    startCommand: "heroku-php-apache2 public/"
+    startCommand: "php artisan serve --host 0.0.0.0 --port 10000"
     envVars:
       - key: APP_NAME
         value: "Avenue Brand"
@@ -11,11 +12,10 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
+      - key: APP_KEY
+        sync: false
       - key: APP_URL
-        fromService:
-          name: avenuebrand
-          type: web
-          property: host
+        value: https://avenuebrand.onrender.com
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
@@ -55,10 +55,9 @@ services:
 
 databases:
   - name: avenue-db
-    plan: starter
+    plan: free
     type: mysql
-
   - name: avenue-redis
     type: redis
-    plan: starter
+    plan: free
     maxmemoryPolicy: noeviction
