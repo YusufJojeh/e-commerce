@@ -6,31 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
   public function up(): void {
-    Schema::create('products', function (Blueprint $t) {
-      $t->id();
+    Schema::create('products', function (Blueprint $table) {
+      $table->id();
 
       // Relations
-      $t->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
-      $t->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
+      $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+      $table->foreignId('brand_id')->nullable()->constrained('brands')->nullOnDelete();
 
       // Main fields
-      $t->string('name');
-      $t->string('slug')->unique();
-      $t->text('short_description')->nullable();
-      $t->longText('description')->nullable();
-      $t->string('sku')->unique()->nullable();
+      $table->string('name');
+      $table->string('slug')->unique();
+      $table->text('short_description')->nullable();
+      $table->longText('description')->nullable();
+      $table->string('sku')->unique()->nullable();
 
       // Pricing & inventory
-      $t->decimal('price', 10, 2);
-      $t->decimal('sale_price', 10, 2)->nullable();
-      $t->unsignedInteger('stock_qty')->default(0);
+      $table->decimal('price', 10, 2);
+      $table->decimal('sale_price', 10, 2)->nullable();
+      $table->unsignedInteger('stock_qty')->default(0);
 
       // Status for homepage sections
-      $t->boolean('is_active')->default(true);
-      $t->boolean('is_featured')->default(false); // "Special"
-      $t->timestamp('published_at')->nullable()->index();
+      $table->boolean('is_active')->default(true);
+      $table->boolean('is_featured')->default(false); // "Special"
+      $table->timestamp('published_at')->nullable()->index();
 
-      $t->timestamps();
+      $table->timestamps();
     });
   }
 

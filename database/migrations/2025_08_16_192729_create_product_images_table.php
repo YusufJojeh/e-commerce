@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
   public function up(): void {
-    Schema::create('product_images', function (Blueprint $t) {
-      $t->id();
-      $t->foreignId('product_id')->constrained()->cascadeOnDelete();
-      $t->string('path');           // e.g. products/abc.jpg (stored on 'public' disk)
-      $t->string('alt')->nullable();
-      $t->boolean('is_primary')->default(false);
-      $t->unsignedInteger('sort_order')->default(0);
-      $t->timestamps();
+    Schema::create('product_images', function (Blueprint $table) {
+      $table->id();
+      $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+      $table->string('path');           // e.g. products/abc.jpg (stored on 'public' disk)
+      $table->string('alt')->nullable();
+      $table->boolean('is_primary')->default(false);
+      $table->unsignedInteger('sort_order')->default(0);
+      $table->timestamps();
     });
   }
 

@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $t) {
-            $t->id();
-            $t->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
-            $t->string('name');
-            $t->string('slug')->unique();
-            $t->text('description')->nullable();
-            $t->boolean('is_active')->default(true);
-            $t->unsignedInteger('sort_order')->default(0);
-            $t->timestamps();
-          });
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('sort_order')->default(0);
+            $table->timestamps();
+        });
     }
 
     /**

@@ -6,12 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
   public function up(): void {
-    Schema::create('settings', function (Blueprint $t) {
-      $t->id();
-      $t->string('key')->unique();   // e.g. site.name, site.logo_light, home.limits
-      $t->text('value')->nullable(); // string or JSON
-      $t->string('group')->nullable();
-      $t->timestamps();
+    Schema::create('settings', function (Blueprint $table) {
+      $table->id();
+      $table->string('key')->unique();   // e.g. site.name, site.logo_light, home.limits
+      $table->text('value')->nullable(); // string or JSON
+      $table->string('group')->nullable();
+      $table->timestamps();
     });
   }
   public function down(): void { Schema::dropIfExists('settings'); }
